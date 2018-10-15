@@ -19,8 +19,10 @@ function setAttribute($elem, key, value) {
       EVENT_HANDLER_MAP.set($elem, handlers);
     }
     handlers[key.slice(2)] = value;
+
   } else if (key === "style") {
     $elem.style.cssText = value;
+
   } else if (key in $elem) {
     // Element exposes attribute as a property.  We should be able to set it
     // using an assignment expression.
@@ -44,12 +46,14 @@ function setAttribute($elem, key, value) {
     } else {
       $elem[key] = value;
     }
+
   } else if (typeof value === "boolean") {
     if (value) {
       $elem.setAttribute(key, "");
     } else {
       $elem.removeAttribute(key);
     }
+
   } else {
     $elem.setAttribute(key, value);
   }
@@ -68,14 +72,17 @@ function removeAttribute($elem, key) {
         EVENT_HANDLER_MAP.delete(key.slice(2));
       }
     }
+
   } else if (key === "style") {
     $elem.style.cssText = "";
+
   } else if (
     key in $elem &&
-	  !($elem.localName === "option" && key === "value") &&
-		!($elem.localName === "input" && key === "type")
+    !($elem.localName === "option" && key === "value") &&
+    !($elem.localName === "input" && key === "type")
   ) {
     $elem[key] = null;
+
   } else {
     $elem.removeAttribute(key);
   }
@@ -131,6 +138,7 @@ function update(node, $parent, $elem) {
     } else {
       $elem.nodeValue = node;
     }
+
   } else {
     if ($elem == null || $elem.localName !== node.type) {
       $elem = document.createElement(node.type);

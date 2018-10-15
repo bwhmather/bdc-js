@@ -1,3 +1,7 @@
+// The dom doesn't provide a way to list all registered event handlers, and
+// even if it did, there wouldn't be an easy way to figure out which belonged
+// to us.  Instead we maintain our own global map of event handlers to keep
+// track of what we've registered.
 let EVENT_HANDLER_MAP = new WeakMap();
 
 function handleEvent(evt) {
@@ -21,6 +25,8 @@ function setAttribute($elem, key, value) {
     handlers[key.slice(2)] = value;
 
   } else if (key === "style") {
+    // `$elem.style` is a CSS object, but they aren't terribly easy to build.
+    // We instead expect the style to be built as a string and clobber cssText.
     $elem.style.cssText = value;
 
   } else if (key in $elem) {

@@ -2,10 +2,10 @@
 // even if it did, there wouldn't be an easy way to figure out which belonged
 // to us.  Instead we maintain our own global map of event handlers to keep
 // track of what we've registered.
-let EVENT_HANDLER_MAP = new WeakMap();
+const EVENT_HANDLER_MAP = new WeakMap();
 
 function handleEvent(evt) {
-  let handler = EVENT_HANDLER_MAP.get(evt.target)[evt.type];
+  const handler = EVENT_HANDLER_MAP.get(evt.target)[evt.type];
   if (typeof handler === "function") {
     return handler.call(evt.target, evt);
   }
@@ -67,7 +67,7 @@ function setAttribute($elem, key, value) {
 
 function removeAttribute($elem, key) {
   if (key[0] === "o" && key[1] === "n") {
-    let handlers = EVENT_HANDLER_MAP.get($elem);
+    const handlers = EVENT_HANDLER_MAP.get($elem);
     if (typeof handlers !== "undefined") {
       if (handlers.hasOwnProperty[key.slice(2)]) {
         $elem.removeEventListener(key.slice(2), handlers[key.slice(2)], false);
@@ -95,26 +95,27 @@ function removeAttribute($elem, key) {
 }
 
 function listAttributes($elem) {
-  let attributes = [];
+  const attributes = [];
+  // tslint:disable-next-line
   for (let i = 0; i < $elem.attributes.length; i++) {
     attributes.push($elem.attributes[i]);
   }
 
   Object.keys(EVENT_HANDLER_MAP.get($elem) || {}).forEach((eventName) => {
     attributes.push("on" + eventName);
-  })
+  });
 
   return attributes;
 }
 
 function updateAttributes($elem, attributes) {
-  for (let attr of listAttributes($elem)) {
+  for (const attr of listAttributes($elem)) {
     if (!attributes.hasOwnProperty(attr)) {
       removeAttribute($elem, attr);
     }
   }
 
-  for (let attr in attributes) {
+  for (const attr in attributes) {
     if (attributes.hasOwnProperty(attr)) {
       setAttribute($elem, attr, attributes[attr]);
     }
@@ -123,8 +124,8 @@ function updateAttributes($elem, attributes) {
 
 function updateChildren($elem, children) {
   for (let i = 0; i < children.length; i++) {
-    let $childElem = $elem.childNodes[i];
-    let childNode = children[i];
+    const $childElem = $elem.childNodes[i];
+    const childNode = children[i];
 
     update(childNode, $elem, $childElem);
   }
@@ -136,10 +137,10 @@ function updateChildren($elem, children) {
 
 // Renders a node to an element and returns it.
 function update(node, $parent, $elem) {
-  let $original = $elem;
+  const $original = $elem;
 
-  if (typeof node == 'string') {
-    if ($elem == null || $elem.nodeType != Node.TEXT_NODE) {
+  if (typeof node === "string") {
+    if ($elem === null || $elem.nodeType !== Node.TEXT_NODE) {
       $elem = document.createTextNode(node);
     } else {
       $elem.nodeValue = node;

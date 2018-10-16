@@ -140,7 +140,7 @@ function update(node, $parent, $elem) {
   const $original = $elem;
 
   if (typeof node === "string") {
-    if ($elem === null || $elem.nodeType !== Node.TEXT_NODE) {
+    if ($elem == null || $elem.nodeType !== Node.TEXT_NODE) {
       $elem = document.createTextNode(node);
     } else {
       $elem.nodeValue = node;

@@ -26,7 +26,7 @@
   "scripts": {
     "build": "rollup -c",
     "pretest": "npm run build",
-    "test": "testcafe firefox:headless tests/index.js",
+    "test": "testcafe firefox:headless tests/index.js --no-color",
     "tslint": "tslint src/*.ts src/*/*.ts"
   },
   "files": [

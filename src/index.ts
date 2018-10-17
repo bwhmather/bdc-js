@@ -98,7 +98,7 @@ function listAttributes($elem) {
   const attributes = [];
   // tslint:disable-next-line
   for (let i = 0; i < $elem.attributes.length; i++) {
-    attributes.push($elem.attributes[i]);
+    attributes.push($elem.attributes[i].name);
   }
 
   Object.keys(EVENT_HANDLER_MAP.get($elem) || {}).forEach((eventName) => {

@@ -1,8 +1,9 @@
 {
   "name": "bdc",
   "description": "Ben's DOM Clobberer",
+  "license": "MIT",
   "keywords": [],
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Ben Mather <bwhmather@bwhmather.com> (bwhmather.com)",
   "homepage": "https://github.com/bwhmather/bdc-js",
   "repository": {
@@ -17,12 +18,15 @@
     "rollup": "^0.65.2",
     "rollup-plugin-typescript2": "^0.16.1",
     "rollup-plugin-uglify": "^4.0.0",
+    "testcafe": "^0.22.0",
     "tslint": "^5.5.0",
-    "typescript": "^3.0.3",
+    "typescript": "^3.1.3",
     "typescript-formatter": "^7.1.0"
   },
   "scripts": {
     "build": "rollup -c",
+    "pretest": "npm run build",
+    "test": "testcafe firefox:headless tests/index.js --no-color",
     "tslint": "tslint src/*.ts src/*/*.ts"
   },
   "files": [

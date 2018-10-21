@@ -43,7 +43,7 @@ export default [
     ],
     output: {
       format: 'iife',
-      name: 'cp',
+      name: 'bdc',
       file: 'dist/bdc.js',
       sourcemap: true,
       sourcemapFile: 'dist/bdc.js.map',
@@ -60,7 +60,7 @@ export default [
     ],
     output: {
       format: 'iife',
-      name: 'cp',
+      name: 'bdc',
       file: 'dist/bdc.min.js',
       sourcemap: true,
       sourcemapFile: 'dist/bdc.min.js.map'

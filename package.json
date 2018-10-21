@@ -3,7 +3,7 @@
   "description": "Ben's DOM Clobberer",
   "license": "MIT",
   "keywords": [],
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Ben Mather <bwhmather@bwhmather.com> (bwhmather.com)",
   "homepage": "https://github.com/bwhmather/bdc-js",
   "repository": {
@@ -27,7 +27,8 @@
     "build": "rollup -c",
     "pretest": "npm run build",
     "test": "testcafe firefox:headless tests/index.js --no-color",
-    "tslint": "tslint src/*.ts src/*/*.ts"
+    "tslint": "tslint src/*.ts src/*/*.ts",
+    "prepack": "npm run build"
   },
   "files": [
     "dist/*.js",

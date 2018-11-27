@@ -2,20 +2,9 @@
 // even if it did, there wouldn't be an easy way to figure out which belonged
 // to us.  Instead we maintain our own global map of event handlers to keep
 // track of what we've registered.
-// `EVENT_HANDLER_MAP`` is a weak mapping from HTML elements to dictionaries
-// mapping from event names to the functions BDC should call in response to
-// them.
+// `EVENT_HANDLER_MAP`` is a weak mapping from HTML elements to objects mapping
+// from event names to the functions BDC should call in response to them.
 const EVENT_HANDLER_MAP = new WeakMap();
-
-function handleEvent(evt) {
-  const handler = EVENT_HANDLER_MAP.get(evt.target)[evt.type];
-  if (typeof handler === "function") {
-    return handler.call(evt.target, evt);
-  }
-  if (typeof handler.handleEvent === "function") {
-    return handler.handleEvent(evt);
-  }
-}
 
 /**
  * Sets an attribute or event handler on an HTML element to the requested
@@ -38,13 +27,20 @@ function setAttribute($elem, key, value) {
     // The attribute is an event handler.  Unfortunately the DOM doesn't
     // provide any way to list event handlers, or to remove event handlers by
     // name.  See documentation on `EVENT_HANDLER_MAP`.
-    let handlers = EVENT_HANDLER_MAP.get($elem);
-    if (typeof handlers === "undefined") {
-      $elem.addEventListener(key.slice(2), handleEvent, false);
-      handlers = {};
-      EVENT_HANDLER_MAP.set($elem, handlers);
+    let eventName = key.slice(2);
+    if (!EVENT_HANDLER_MAP.has($elem)) {
+      EVENT_HANDLER_MAP.set($elem, {});
     }
-    handlers[key.slice(2)] = value;
+    let handlers = EVENT_HANDLER_MAP.get($elem);
+
+    // Check for and, if necessary, remove any old event handlers.
+    if (handlers.hasOwnProperty(eventName)) {
+      $elem.removeEventListener(eventName, handlers[eventName], false);
+    }
+
+    // Install and record the new event handler.
+    handlers[eventName] = value;
+    $elem.addEventListener(eventName, value, false);
 
   } else if (key === "style") {
     // `$elem.style` is a CSS object, but they aren't terribly easy to build.
@@ -104,15 +100,14 @@ function removeAttribute($elem, key) {
     const handlers = EVENT_HANDLER_MAP.get($elem);
     if (typeof handlers !== "undefined") {
       const eventName = key.slice(2);
-      if (handlers.hasOwnProperty[eventName]) {
-        $elem.removeEventListener(eventName, handlers[eventName], false);
-        delete handlers[eventName];
-      }
+
+      $elem.removeEventListener(eventName, handlers[eventName], false);
+      delete handlers[eventName];
 
       if (Object.keys(handlers).length === 0) {
         // BDC no longer has any handlers linked listening for events from this
         // element.  We can clean up the empty entry.
-        EVENT_HANDLER_MAP.delete(key.slice(2));
+        EVENT_HANDLER_MAP.delete($elem);
       }
     }
 

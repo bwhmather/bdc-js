@@ -27,11 +27,12 @@ function setAttribute($elem, key, value) {
     // The attribute is an event handler.  Unfortunately the DOM doesn't
     // provide any way to list event handlers, or to remove event handlers by
     // name.  See documentation on `EVENT_HANDLER_MAP`.
-    let eventName = key.slice(2);
+    const eventName = key.slice(2);
     if (!EVENT_HANDLER_MAP.has($elem)) {
       EVENT_HANDLER_MAP.set($elem, {});
     }
-    let handlers = EVENT_HANDLER_MAP.get($elem);
+
+    const handlers = EVENT_HANDLER_MAP.get($elem);
 
     // Check for and, if necessary, remove any old event handlers.
     if (handlers.hasOwnProperty(eventName)) {

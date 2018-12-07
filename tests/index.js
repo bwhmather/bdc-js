@@ -31,7 +31,6 @@ test("Empty div", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
-
 test("List", async t => {
   await t.eval(() => {
     bdc.render(
@@ -51,7 +50,6 @@ test("List", async t => {
   await t.expect($root.child(0).child(1).textContent).eql("item 2");
   await t.expect($root.child(0).child(2).textContent).eql("item 3");
 });
-
 
 test("Link", async t => {
   await t.eval(() => {
@@ -118,4 +116,112 @@ test("Removing attributes", async t => {
   });
 
   await t.expect($root.child(0).attributes).eql({'x-b': "new"});
+});
+
+test("Event handlers", async t => {
+  // Set an event handler.
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('button', {'onclick': evt => {
+        evt.target.setAttribute('x-clicked', "");
+      }}),
+    );
+  });
+
+  // Click the button.
+  await t.click($root.child('button'));
+
+  // Check the value.
+  await t.expect($root.child(0).attributes).eql({'x-clicked': ""});
+});
+
+test("Removing event handlers", async t => {
+  // Set an event handler.
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('button', {'onclick': evt => {
+        evt.target.setAttribute('x-clicked', "");
+      }}),
+    );
+  });
+
+  // Remove the event handler.
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('button', {}),
+    );
+  });
+
+  // Click the button.
+  await t.click($root.child('button'));
+
+  // Check that the handler wasn't fired.
+  await t.expect($root.child(0).attributes).eql({});
+});
+
+test("Replacing event handlers", async t => {
+  // Set an event handler.
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('button', {'onclick': evt => {
+        evt.target.setAttribute('x-old-clicked', "");
+      }}),
+    );
+  });
+
+  // Remove the event handler.
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('button', {'onclick': evt => {
+        evt.target.setAttribute('x-new-clicked', "");
+      }})
+    );
+  });
+
+  // Click the button.
+  await t.click($root.child('button'));
+
+  // Check that the handler wasn't fired.
+  await t.expect($root.child(0).attributes).eql({'x-new-clicked': ""});
+});
+
+test("Restoring event handlers", async t => {
+  // Set an event handler.
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('button', {'onclick': evt => {
+        evt.target.setAttribute('x-clicked', "");
+      }}),
+    );
+  });
+
+  // Remove the event handler.
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('button', {}),
+    );
+  });
+
+  // Reset the event handler.
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('button', {'onclick': evt => {
+        evt.target.setAttribute('x-clicked', "");
+      }}),
+    );
+  });
+
+  // Click the button.
+  await t.click($root.child('button'));
+
+  // Check that the handler wasn't fired.
+  await t.expect($root.child(0).attributes).eql({'x-clicked': ""});
 });

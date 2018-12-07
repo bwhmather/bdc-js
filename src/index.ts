@@ -152,6 +152,16 @@ function listAttributes($elem) {
   return attributes;
 }
 
+/**
+ * Replaces the attributes of an HTML element with the values described by an
+ * object representing a set of key value pairs.
+ *
+ * @param $elem
+ *   The HTML element to update the attributes of.
+ * @param attributes
+ *   A plain JS object with keys corresponding to attributes in the target
+ *   state of the element.
+ */
 function updateAttributes($elem, attributes) {
   for (const attr of listAttributes($elem)) {
     if (!attributes.hasOwnProperty(attr)) {

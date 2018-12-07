@@ -26,7 +26,8 @@ function setAttribute($elem, key, value) {
   if (key[0] === "o" && key[1] === "n") {
     // The attribute is an event handler.  Unfortunately the DOM doesn't
     // provide any way to list event handlers, or to remove event handlers by
-    // name.  See documentation on `EVENT_HANDLER_MAP`.
+    // name.  See documentation on `EVENT_HANDLER_MAP` for details on how we
+    // work around this.
     const eventName = key.slice(2);
     if (!EVENT_HANDLER_MAP.has($elem)) {
       EVENT_HANDLER_MAP.set($elem, {});

@@ -3,7 +3,7 @@
   "description": "Ben's DOM Clobberer",
   "license": "MIT",
   "keywords": [],
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "Ben Mather <bwhmather@bwhmather.com> (bwhmather.com)",
   "homepage": "https://github.com/bwhmather/bdc-js",
   "repository": {
@@ -31,9 +31,13 @@
     "prepack": "npm run build"
   },
   "files": [
-    "dist/*.js",
-    "dist/*.mjs",
-    "dist/*.d.ts",
-    "dist/**/*.d.ts"
+    "dist/bdc.js",
+    "dist/bdc.js.map",
+    "dist/bdc.min.js",
+    "dist/bdc.min.js.map",
+    "dist/bdc.mjs",
+    "dist/bdc.mjs.map",
+    "dist/bdc.umd.js",
+    "dist/bdc.umd.js.map",
   ]
 }

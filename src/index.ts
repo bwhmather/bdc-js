@@ -26,12 +26,14 @@ function setAttribute($elem, key, value) {
   if (key[0] === "o" && key[1] === "n") {
     // The attribute is an event handler.  Unfortunately the DOM doesn't
     // provide any way to list event handlers, or to remove event handlers by
-    // name.  See documentation on `EVENT_HANDLER_MAP`.
-    let eventName = key.slice(2);
+    // name.  See documentation on `EVENT_HANDLER_MAP` for details on how we
+    // work around this.
+    const eventName = key.slice(2);
     if (!EVENT_HANDLER_MAP.has($elem)) {
       EVENT_HANDLER_MAP.set($elem, {});
     }
-    let handlers = EVENT_HANDLER_MAP.get($elem);
+
+    const handlers = EVENT_HANDLER_MAP.get($elem);
 
     // Check for and, if necessary, remove any old event handlers.
     if (handlers.hasOwnProperty(eventName)) {
@@ -150,6 +152,16 @@ function listAttributes($elem) {
   return attributes;
 }
 
+/**
+ * Replaces the attributes of an HTML element with the values described by an
+ * object representing a set of key value pairs.
+ *
+ * @param $elem
+ *   The HTML element to update the attributes of.
+ * @param attributes
+ *   A plain JS object with keys corresponding to attributes in the target
+ *   state of the element.
+ */
 function updateAttributes($elem, attributes) {
   for (const attr of listAttributes($elem)) {
     if (!attributes.hasOwnProperty(attr)) {

@@ -9,6 +9,12 @@ export default [
       typescript({
         abortOnError: false,
         useTsconfigDeclarationDir: true,
+        tsconfigOverride: {
+          compilerOptions: {
+            declaration: true,
+            declarationDir: "dist/types",
+          },
+        },
       }),
     ],
     output: {
@@ -23,7 +29,6 @@ export default [
     plugins: [
       typescript({
         abortOnError: false,
-        useTsconfigDeclarationDir: true,
       }),
     ],
     output: {
@@ -38,7 +43,6 @@ export default [
     plugins: [
       typescript({
         abortOnError: false,
-        useTsconfigDeclarationDir: true,
       }),
     ],
     output: {
@@ -54,7 +58,6 @@ export default [
     plugins: [
       typescript({
         abortOnError: false,
-        useTsconfigDeclarationDir: true,
       }),
       uglify(),
     ],

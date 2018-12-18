@@ -243,7 +243,7 @@ function update(node, $parent, $elem) {
  *   array.
  */
 export function h(type, attributes, ...children) {
-  if (children.length == 1 && Array.isArray(children[0])) {
+  if (children.length === 1 && Array.isArray(children[0])) {
     children = children[0];
   }
   return { type, attributes, children };

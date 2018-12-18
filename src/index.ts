@@ -239,9 +239,13 @@ function update(node, $parent, $elem) {
  *   A non-optional mapping from attribute names to target state values.
  * @param children
  *   An arbitrary number of node objects or strings describing the children of
- *   this node.
+ *   this node.  Can be provided either as variadic arguments, or as a single
+ *   array.
  */
 export function h(type, attributes, ...children) {
+  if (children.length == 1 && Array.isArray(children[0])) {
+    children = children[0];
+  }
   return { type, attributes, children };
 }
 

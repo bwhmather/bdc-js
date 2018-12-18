@@ -31,7 +31,7 @@ test("Empty div", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
-test("List", async t => {
+test("Variadic List", async t => {
   await t.eval(() => {
     bdc.render(
       document.getElementById('root'),
@@ -40,6 +40,26 @@ test("List", async t => {
         bdc.h('li', {}, "item 2"),
         bdc.h('li', {}, "item 3"),
       ),
+    );
+  });
+
+  await t.expect($root.childElementCount).eql(1);
+  await t.expect($root.child(0).tagName).eql('ul');
+  await t.expect($root.child(0).childElementCount).eql(3);
+  await t.expect($root.child(0).child(0).textContent).eql("item 1");
+  await t.expect($root.child(0).child(1).textContent).eql("item 2");
+  await t.expect($root.child(0).child(2).textContent).eql("item 3");
+});
+
+test("Array List", async t => {
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('ul', {}, [
+        bdc.h('li', {}, "item 1"),
+        bdc.h('li', {}, "item 2"),
+        bdc.h('li', {}, "item 3"),
+      ]),
     );
   });
 

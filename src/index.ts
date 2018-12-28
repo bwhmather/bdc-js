@@ -261,5 +261,15 @@ export function h(type, attributes, ...children) {
  *   state of the children of this element.
  */
 export function render($root, ...nodes) {
+  const activeElement = document.activeElement as HTMLElement;
+
   updateChildren($root, nodes);
+
+  if (
+    activeElement != null &&
+    document.activeElement !== activeElement &&
+    typeof activeElement.focus === "function"
+  ) {
+    activeElement.focus();
+  }
 }

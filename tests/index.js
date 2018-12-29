@@ -71,6 +71,37 @@ test("Array List", async t => {
   await t.expect($root.child(0).child(2).textContent).eql("item 3");
 });
 
+test("Keyed List", async t => {
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('ul', {}, [
+        bdc.h('li', {'x-bdc-key': 'a'}, bdc.h('input', {})),
+        bdc.h('li', {'x-bdc-key': 'b'}, bdc.h('input', {})),
+        bdc.h('li', {'x-bdc-key': 'c'}, bdc.h('input', {})),
+        bdc.h('li', {'x-bdc-key': 'd'}, bdc.h('input', {})),
+        bdc.h('li', {'x-bdc-key': 'e'}, bdc.h('input', {})),
+      ]),
+    );
+  });
+
+  await t.click($root.child('ul').child(2).child('input'));
+
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('ul', {}, [
+        bdc.h('li', {'x-bdc-key': 'd'}, bdc.h('input', {})),
+        bdc.h('li', {'x-bdc-key': 'c'}, bdc.h('input', {})),
+        bdc.h('li', {'x-bdc-key': 'b'}, bdc.h('input', {})),
+        bdc.h('li', {'x-bdc-key': 'a'}, bdc.h('input', {})),
+      ]),
+    );
+  });
+
+  await t.expect($root.child('ul').child(1).child('input').focused).eql(true);
+});
+
 test("Link", async t => {
   await t.eval(() => {
     bdc.render(

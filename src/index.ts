@@ -176,21 +176,36 @@ function updateAttributes($elem, attributes) {
   }
 }
 
+/**
+ * Updates the children of `$elem` to match a list of node descriptions.
+ *
+ * @param $elem
+ *   The HTML element who's children should be updated.
+ * @param children
+ *   An array of node descriptions.
+ */
 function updateChildren($elem, children) {
-  for (let i = 0; i < children.length; i++) {
-    const $childElem = $elem.childNodes[i];
-    const childNode = children[i];
-
-    update(childNode, $elem, $childElem);
+  let $cursor = $elem.firstChild;
+  for (const childNode of children) {
+    $cursor = update(childNode, $elem, $cursor);
   }
 
-  while ($elem.childNodes.length > children.length) {
-    $elem.removeChild($elem.lastChild);
+  // Remove any trailing elements.
+  while ($cursor) {
+    const $target = $cursor;
+    $cursor = $cursor.nextSibling;
+    $elem.removeChild($target);
   }
 }
 
 /**
  * Creates, replaces, or updates an HTML element to match a node description.
+ *
+ * Basic operation:
+ *   - Search from `$cursor` for elements matching key..
+ *   - If type does not match then remove the element and create a new one.
+ *   - Update the element to match node description.
+ *   - Reinsert the element in the right place.
  *
  * @param node
  *   A description of the target state of the HTML element.
@@ -203,9 +218,12 @@ function updateChildren($elem, children) {
  *   describes a new child that should be appended to the current list.  If the
  *   type of the element does not match the node type it will be replaced
  *   rather than updated.
+ *
+ * @returns
+ *   An updated cursor.
  */
-function update(node, $parent, $elem) {
-  const $original = $elem;
+function update(node, $parent, $cursor) {
+  let $elem = $cursor;
 
   if (typeof node === "string") {
     if ($elem == null || $elem.nodeType !== Node.TEXT_NODE) {
@@ -215,7 +233,40 @@ function update(node, $parent, $elem) {
     }
 
   } else {
-    if ($elem == null || $elem.localName !== node.type) {
+    // Find matching element.
+    const nodeKey = node.attributes["x-bdc-key"] || null;
+
+    while ($elem) {
+      if ($elem.nodeType !== Node.TEXT_NODE) {
+        let elemKey = null;
+        // In slightly older browsers, `getAttribute` will return an empty
+        // string if an attribute is missing.
+        if ($elem.hasAttribute("x-bdc-key")) {
+          elemKey = $elem.getAttribute("x-bdc-key");
+        }
+
+        if (elemKey === nodeKey) {
+          break;
+        }
+      }
+
+      $elem = $elem.nextSibling;
+    }
+
+    if ($elem != null && $elem.localName !== node.type) {
+      // Have found an element with the right key, but the type has changed so
+      // we need to recreate it.
+      if ($elem === $cursor) {
+        $cursor = $elem.nextSibling;
+      }
+
+      $parent.removeChild($elem);
+      $elem = null;
+    }
+
+    if ($elem == null) {
+      // Can't find an existing element of the right type to update.  Create a
+      // new one.
       $elem = document.createElement(node.type);
     }
 
@@ -223,11 +274,11 @@ function update(node, $parent, $elem) {
     updateChildren($elem, node.children);
   }
 
-  if ($original == null) {
-    $parent.appendChild($elem);
-  } else if ($elem !== $original) {
-    $parent.replaceChild($elem, $original);
+  if ($elem !== $cursor) {
+    $parent.insertBefore($elem, $cursor);
   }
+
+  return $elem.nextSibling;
 }
 
 /**
@@ -243,7 +294,7 @@ function update(node, $parent, $elem) {
  *   array.
  */
 export function h(type, attributes, ...children) {
-  if (children.length == 1 && Array.isArray(children[0])) {
+  if (children.length === 1 && Array.isArray(children[0])) {
     children = children[0];
   }
   return { type, attributes, children };
@@ -261,5 +312,15 @@ export function h(type, attributes, ...children) {
  *   state of the children of this element.
  */
 export function render($root, ...nodes) {
+  const activeElement = document.activeElement as HTMLElement;
+
   updateChildren($root, nodes);
+
+  if (
+    activeElement != null &&
+    document.activeElement !== activeElement &&
+    typeof activeElement.focus === "function"
+  ) {
+    activeElement.focus();
+  }
 }

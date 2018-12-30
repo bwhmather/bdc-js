@@ -7,6 +7,10 @@ description.
 Unlike libraries such as react, BDC tries to diff directly against the DOM.
 This results in a smaller, simpler, and probably much slower library.
 
+BDC is currently under heavy development, and the API is likely to change
+significantly before 1.0.  You should currently expect to encounter frequent
+bugs and breaking changes.
+
 
 ## Installation
 
@@ -25,6 +29,11 @@ to make the DOM match.
 
 `h` takes a tag name, an object containing attributes to set on the html
 element, and any number of child nodes as variadic arguments
+
+
+## Contributing
+
+BDC development is hosted on github at https://github.com/bwhmather/bdc-js.
 
 
 ## License

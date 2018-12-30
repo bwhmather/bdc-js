@@ -321,6 +321,6 @@ export function render($root, ...nodes) {
     document.activeElement !== activeElement &&
     typeof activeElement.focus === "function"
   ) {
-    activeElement.focus();
+    activeElement.focus({preventScroll: true});
   }
 }

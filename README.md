@@ -1,6 +1,8 @@
 Ben's DOM Clobberer
 ===================
 
+[![Build Status](https://travis-ci.org/bwhmather/bdc-js.svg?branch=develop)](https://travis-ci.org/bwhmather/bdc-js)
+
 Yet another javascript library for updating the html DOM to match a javascript
 description.
 
@@ -34,6 +36,7 @@ element, and any number of child nodes as variadic arguments
 ## Contributing
 
 BDC development is hosted on github at https://github.com/bwhmather/bdc-js.
+Bug reports and pull requests welcomed enthusiastically.
 
 
 ## License

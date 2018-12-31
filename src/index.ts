@@ -59,12 +59,6 @@ function setAttribute($elem, key, value) {
     ) {
       // Chrome will jump the cursor to an end of `input` box or `textarea` if
       // value is re-applied.
-    } else if (
-      ($elem.localName === "select" || $elem.localName === "option") &&
-      key === "value" && $elem.value === "" + value
-    ) {
-      // `select` or `option` inputs will glitch in chrome if assigned the
-      // same value.
     } else if ($elem.localName === "input" && key === "type") {
       // Using an assignment expression to set input type in IE11 causes a big
       // error.

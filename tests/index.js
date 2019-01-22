@@ -276,3 +276,27 @@ test("Restoring event handlers", async t => {
   // Check that the handler wasn't fired.
   await t.expect($root.child(0).attributes).eql({'x-clicked': ""});
 });
+
+test("Re-apply input value preserves cursor", async t => {
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('input', {'value': ""})
+    );
+  });
+
+  await t.click($root.child(0));
+  await t.pressKey("a");
+  await t.pressKey("left");
+
+  await t.eval(() => {
+    bdc.render(
+      document.getElementById('root'),
+      bdc.h('input', {'value': "a"})
+    );
+  });
+
+  await t.pressKey("b");
+
+  await t.expect($root.child(0).value).eql("ba");
+})

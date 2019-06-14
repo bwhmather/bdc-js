@@ -9,9 +9,9 @@ description.
 Unlike libraries such as react, BDC tries to diff directly against the DOM.
 This results in a smaller, simpler, and probably much slower library.
 
-BDC is currently under heavy development, and the API is likely to change
-significantly before 1.0.  You should currently expect to encounter frequent
-bugs and breaking changes.
+BDC is currently under active development but is starting to see use.  The API
+is unlikely to change significantly before 1.0, but there may still be bugs
+that need to be ironed out.
 
 
 ## Installation

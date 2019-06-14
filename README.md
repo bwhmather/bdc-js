@@ -23,11 +23,12 @@ Releases of BDC are published to npm.  They can be installed by running:
 
 ## Usage
 
-BDC exposes two functions, `h` and `render`.
+BDC exposes two functions, `h` and `clobber`.
 `h` can be used to build up a javascript representation of the target state of
 a subtree of the DOM.
-`render` will take that target state, and apply any transformations necessary
-to make the DOM match.
+`clobber` will take a DOM element and a node or list of nodes describing the
+target state of the children of element, and apply any DOM manipulations
+necessary to make the element match.
 
 `h` takes a tag name, an object containing attributes to set on the html
 element, and any number of child nodes as variadic arguments

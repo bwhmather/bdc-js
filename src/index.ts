@@ -305,10 +305,13 @@ export function h(type, attributes, ...children) {
  *   An arbitrary number of node objects or strings describing the desired
  *   state of the children of this element.
  */
-export function clobber($root, ...nodes) {
+export function clobber($root, ...children) {
   const activeElement = document.activeElement as HTMLElement;
 
-  updateChildren($root, nodes);
+  if (children.length === 1 && Array.isArray(children[0])) {
+    children = children[0];
+  }
+  updateChildren($root, children);
 
   if (
     activeElement != null &&

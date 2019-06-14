@@ -31,6 +31,62 @@ test("Empty div", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
+test("Clobber Variadic List", async t => {
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('div', {}, "item 1"),
+      bdc.h('div', {}, "item 2"),
+      bdc.h('div', {}, "item 3"),
+    );
+  });
+
+  await t.expect($root.childElementCount).eql(3);
+  await t.expect($root.child(0).textContent).eql("item 1");
+  await t.expect($root.child(1).textContent).eql("item 2");
+  await t.expect($root.child(2).textContent).eql("item 3");
+});
+
+test("Clobber Array List", async t => {
+  await t.eval(() => {
+    bdc.clobber(document.getElementById('root'), [
+      bdc.h('li', {}, "item 1"),
+      bdc.h('li', {}, "item 2"),
+      bdc.h('li', {}, "item 3"),
+    ]);
+  });
+
+  await t.expect($root.childElementCount).eql(3);
+  await t.expect($root.child(0).textContent).eql("item 1");
+  await t.expect($root.child(1).textContent).eql("item 2");
+  await t.expect($root.child(2).textContent).eql("item 3");
+});
+
+test("Clobber Keyed List", async t => {
+  await t.eval(() => {
+    bdc.clobber(document.getElementById('root'), [
+      bdc.h('div', {'x-bdc-key': 'a'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'b'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'c'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'd'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'e'}, bdc.h('input', {})),
+    ]);
+  });
+
+  await t.click($root.child(2).child('input'));
+
+  await t.eval(() => {
+    bdc.clobber(document.getElementById('root'), [
+      bdc.h('div', {'x-bdc-key': 'd'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'c'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'b'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'a'}, bdc.h('input', {})),
+    ]);
+  });
+
+  await t.expect($root.child(1).child('input').focused).eql(true);
+});
+
 test("Variadic List", async t => {
   await t.eval(() => {
     bdc.clobber(

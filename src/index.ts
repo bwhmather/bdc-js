@@ -275,6 +275,12 @@ function update(node, $parent, $cursor) {
   return $elem.nextSibling;
 }
 
+export type Node = {
+  type: string,
+  attributes: object,
+  children: Node[],
+} | string;
+
 /**
  * Creates a node object describing a regular HTML element.
  *
@@ -287,6 +293,8 @@ function update(node, $parent, $cursor) {
  *   this node.  Can be provided either as variadic arguments, or as a single
  *   array.
  */
+export function h(type: string, attributes: object, children: Node[]): Node;
+export function h(type: string, attributes: object, ...children: Node[]): Node;
 export function h(type, attributes, ...children) {
   if (children.length === 1 && Array.isArray(children[0])) {
     children = children[0];
@@ -305,7 +313,9 @@ export function h(type, attributes, ...children) {
  *   An arbitrary number of node objects or strings describing the desired
  *   state of the children of this element.
  */
-export function clobber($root, ...children) {
+export function clobber($root: HTMLElement, children: Node[]): void;
+export function clobber($root: HTMLElement, ...children: Node[]): void;
+export function clobber($root: HTMLElement, ...children) {
   const activeElement = document.activeElement as HTMLElement;
 
   if (children.length === 1 && Array.isArray(children[0])) {

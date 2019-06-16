@@ -6,7 +6,7 @@ const $root = Selector('#root');
 
 test("Hello world", async t => {
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       "Hello, World!",
     );
@@ -19,7 +19,7 @@ test("Hello world", async t => {
 
 test("Empty div", async t => {
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('div', {}),
     );
@@ -31,9 +31,65 @@ test("Empty div", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
+test("Clobber Variadic List", async t => {
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('div', {}, "item 1"),
+      bdc.h('div', {}, "item 2"),
+      bdc.h('div', {}, "item 3"),
+    );
+  });
+
+  await t.expect($root.childElementCount).eql(3);
+  await t.expect($root.child(0).textContent).eql("item 1");
+  await t.expect($root.child(1).textContent).eql("item 2");
+  await t.expect($root.child(2).textContent).eql("item 3");
+});
+
+test("Clobber Array List", async t => {
+  await t.eval(() => {
+    bdc.clobber(document.getElementById('root'), [
+      bdc.h('li', {}, "item 1"),
+      bdc.h('li', {}, "item 2"),
+      bdc.h('li', {}, "item 3"),
+    ]);
+  });
+
+  await t.expect($root.childElementCount).eql(3);
+  await t.expect($root.child(0).textContent).eql("item 1");
+  await t.expect($root.child(1).textContent).eql("item 2");
+  await t.expect($root.child(2).textContent).eql("item 3");
+});
+
+test("Clobber Keyed List", async t => {
+  await t.eval(() => {
+    bdc.clobber(document.getElementById('root'), [
+      bdc.h('div', {'x-bdc-key': 'a'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'b'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'c'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'd'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'e'}, bdc.h('input', {})),
+    ]);
+  });
+
+  await t.click($root.child(2).child('input'));
+
+  await t.eval(() => {
+    bdc.clobber(document.getElementById('root'), [
+      bdc.h('div', {'x-bdc-key': 'd'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'c'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'b'}, bdc.h('input', {})),
+      bdc.h('div', {'x-bdc-key': 'a'}, bdc.h('input', {})),
+    ]);
+  });
+
+  await t.expect($root.child(1).child('input').focused).eql(true);
+});
+
 test("Variadic List", async t => {
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('ul', {},
         bdc.h('li', {}, "item 1"),
@@ -53,7 +109,7 @@ test("Variadic List", async t => {
 
 test("Array List", async t => {
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('ul', {}, [
         bdc.h('li', {}, "item 1"),
@@ -73,7 +129,7 @@ test("Array List", async t => {
 
 test("Keyed List", async t => {
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('ul', {}, [
         bdc.h('li', {'x-bdc-key': 'a'}, bdc.h('input', {})),
@@ -88,7 +144,7 @@ test("Keyed List", async t => {
   await t.click($root.child('ul').child(2).child('input'));
 
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('ul', {}, [
         bdc.h('li', {'x-bdc-key': 'd'}, bdc.h('input', {})),
@@ -104,7 +160,7 @@ test("Keyed List", async t => {
 
 test("Link", async t => {
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('a', {href: "#success"}, "Add Fragment"),
     );
@@ -118,7 +174,7 @@ test("Link", async t => {
 
 test("Booleans", async t => {
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('div', {'x-a': false, 'x-b': true}),
     );
@@ -129,7 +185,7 @@ test("Booleans", async t => {
 
 test("Swapping", async t => {
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('b', {}, 'Bold'),
       bdc.h('i', {}, 'Italic'),
@@ -137,7 +193,7 @@ test("Swapping", async t => {
   });
 
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('i', {}, "Italic"),
       bdc.h('b', {}, "Bold"),
@@ -153,14 +209,14 @@ test("Swapping", async t => {
 
 test("Removing attributes", async t => {
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('div', {'x-a': "original"}),
     );
   });
 
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('div', {'x-b': "new"}),
     );
@@ -172,7 +228,7 @@ test("Removing attributes", async t => {
 test("Event handlers", async t => {
   // Set an event handler.
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('button', {'onclick': evt => {
         evt.target.setAttribute('x-clicked', "");
@@ -190,7 +246,7 @@ test("Event handlers", async t => {
 test("Removing event handlers", async t => {
   // Set an event handler.
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('button', {'onclick': evt => {
         evt.target.setAttribute('x-clicked', "");
@@ -200,7 +256,7 @@ test("Removing event handlers", async t => {
 
   // Remove the event handler.
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('button', {}),
     );
@@ -216,7 +272,7 @@ test("Removing event handlers", async t => {
 test("Replacing event handlers", async t => {
   // Set an event handler.
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('button', {'onclick': evt => {
         evt.target.setAttribute('x-old-clicked', "");
@@ -226,7 +282,7 @@ test("Replacing event handlers", async t => {
 
   // Remove the event handler.
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('button', {'onclick': evt => {
         evt.target.setAttribute('x-new-clicked', "");
@@ -244,7 +300,7 @@ test("Replacing event handlers", async t => {
 test("Restoring event handlers", async t => {
   // Set an event handler.
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('button', {'onclick': evt => {
         evt.target.setAttribute('x-clicked', "");
@@ -254,7 +310,7 @@ test("Restoring event handlers", async t => {
 
   // Remove the event handler.
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('button', {}),
     );
@@ -262,7 +318,7 @@ test("Restoring event handlers", async t => {
 
   // Reset the event handler.
   await t.eval(() => {
-    bdc.render(
+    bdc.clobber(
       document.getElementById('root'),
       bdc.h('button', {'onclick': evt => {
         evt.target.setAttribute('x-clicked', "");
@@ -276,3 +332,27 @@ test("Restoring event handlers", async t => {
   // Check that the handler wasn't fired.
   await t.expect($root.child(0).attributes).eql({'x-clicked': ""});
 });
+
+test("Re-apply input value preserves cursor", async t => {
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('input', {'value': ""})
+    );
+  });
+
+  await t.click($root.child(0));
+  await t.pressKey("a");
+  await t.pressKey("left");
+
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('input', {'value': "a"})
+    );
+  });
+
+  await t.pressKey("b");
+
+  await t.expect($root.child(0).value).eql("ba");
+})

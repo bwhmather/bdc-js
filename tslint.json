@@ -7,10 +7,13 @@
     "rules": {
         "member-access": [true, "no-public"],
         "max-line-length": [true, 80],
-        "max-classes-per-file": [true, 5],
+        "max-classes-per-file": [false],
         "no-bitwise": [false],
-        "member-ordering": [false],
-        "trailing-comma": [true, "multiline", "always", "singleline", "never"]
+        "member-ordering": [true, "order", "fields-first", "alphabetize", false],
+        "trailing-comma": [true, "multiline", "always", "singleline", "never"],
+        "object-literal-key-quotes": [true, "consistent"],
+        "object-literal-sort-keys": [true, "match-declaration-order-only"],
+        "object-literal-shorthand": [true, "never"]
     },
     "rulesDirectory": []
 }

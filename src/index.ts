@@ -331,7 +331,7 @@ export function h(type, attributes, ...children) {
  */
 export function clobber($root: HTMLElement, children: Node[]): void;
 export function clobber($root: HTMLElement, ...children: Node[]): void;
-export function clobber($root: HTMLElement, ...children) {
+export function clobber($root, ...children) {
   const activeElement = document.activeElement as HTMLElement;
 
   if (children.length === 1 && Array.isArray(children[0])) {

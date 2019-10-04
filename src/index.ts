@@ -232,30 +232,21 @@ function update(node, $parent, $cursor) {
 
     while ($elem) {
       if ($elem.nodeType !== Node.TEXT_NODE) {
-        let elemKey = null;
-        // In slightly older browsers, `getAttribute` will return an empty
-        // string if an attribute is missing.
-        if ($elem.hasAttribute("x-bdc-key")) {
-          elemKey = $elem.getAttribute("x-bdc-key");
-        }
+        if ($elem.localName === node.type) {
+          let elemKey = null;
+          // In slightly older browsers, `getAttribute` will return an empty
+          // string if an attribute is missing.
+          if ($elem.hasAttribute("x-bdc-key")) {
+            elemKey = $elem.getAttribute("x-bdc-key");
+          }
 
-        if (elemKey === nodeKey) {
-          break;
+          if (elemKey === nodeKey) {
+            break;
+          }
         }
       }
 
       $elem = $elem.nextSibling;
-    }
-
-    if ($elem != null && $elem.localName !== node.type) {
-      // Have found an element with the right key, but the type has changed so
-      // we need to recreate it.
-      if ($elem === $cursor) {
-        $cursor = $elem.nextSibling;
-      }
-
-      $parent.removeChild($elem);
-      $elem = null;
     }
 
     if ($elem == null) {

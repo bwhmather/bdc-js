@@ -48,10 +48,11 @@ needed to make the two match.
 Using it inline is simple:
 
 ```javascript
-clobber($root, h("marquee", {}, "Hello"), ", ", h("blink", {}, "world"), "!");
+clobber(document.body, h("marquee", {}, "Hello"), ", ", h("blink", {}, "world"), "!");
 ```
 
-When run, this example will update the `$root` to contain the following HTML:
+When run, this example will update the body of the current document to contain
+the following HTML:
 
 ```html
 <marquee>Hello</marquee>, <blink>world</blink>

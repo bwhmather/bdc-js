@@ -12,7 +12,7 @@ script:
 before_deploy:
   - "git config --local user.name 'Ben Mather'"
   - "git config --local user.email 'bwhmather@bwhmather.com'"
-  - "export TRAVIS_TAG=${npm info bdc version}"
+  - "export TRAVIS_TAG=$(npm info bdc version)"
   - "git tag $TRAVIS_TAG"
   - "npm pack"
 

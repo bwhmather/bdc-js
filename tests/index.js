@@ -355,4 +355,39 @@ test("Re-apply input value preserves cursor", async t => {
   await t.pressKey("b");
 
   await t.expect($root.child(0).value).eql("ba");
-})
+});
+
+test("No injection on create text node", async t => {
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('p', {}, "<script>window.alert('w00t')</script>"),
+    );
+  });
+
+  await t.expect($root.childElementCount).eql(1);
+  await t.expect($root.child(0).textContent).eql(
+    "<script>window.alert('w00t')</script>"
+  );
+});
+
+test("No injection on update text node", async t => {
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('p', {}, "harmless"),
+    );
+  });
+
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('p', {}, "<script>window.alert('w00t')</script>"),
+    );
+  });
+
+  await t.expect($root.childElementCount).eql(1);
+  await t.expect($root.child(0).textContent).eql(
+    "<script>window.alert('w00t')</script>"
+  );
+});

@@ -1,3 +1,28 @@
+/***
+ * Ben's DOM Clobberer
+ * ===================
+ *
+ * Copyright (c) 2018 Ben Mather <bwhmather@bwhmather.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
 // The DOM doesn't provide a way to list all registered event handlers, and
 // even if it did, there wouldn't be an easy way to figure out which belonged
 // to us.  Instead we maintain our own global map of event handlers to keep
@@ -232,30 +257,21 @@ function update(node, $parent, $cursor) {
 
     while ($elem) {
       if ($elem.nodeType !== Node.TEXT_NODE) {
-        let elemKey = null;
-        // In slightly older browsers, `getAttribute` will return an empty
-        // string if an attribute is missing.
-        if ($elem.hasAttribute("x-bdc-key")) {
-          elemKey = $elem.getAttribute("x-bdc-key");
-        }
+        if ($elem.localName === node.type) {
+          let elemKey = null;
+          // In slightly older browsers, `getAttribute` will return an empty
+          // string if an attribute is missing.
+          if ($elem.hasAttribute("x-bdc-key")) {
+            elemKey = $elem.getAttribute("x-bdc-key");
+          }
 
-        if (elemKey === nodeKey) {
-          break;
+          if (elemKey === nodeKey) {
+            break;
+          }
         }
       }
 
       $elem = $elem.nextSibling;
-    }
-
-    if ($elem != null && $elem.localName !== node.type) {
-      // Have found an element with the right key, but the type has changed so
-      // we need to recreate it.
-      if ($elem === $cursor) {
-        $cursor = $elem.nextSibling;
-      }
-
-      $parent.removeChild($elem);
-      $elem = null;
     }
 
     if ($elem == null) {
@@ -315,7 +331,7 @@ export function h(type, attributes, ...children) {
  */
 export function clobber($root: HTMLElement, children: Node[]): void;
 export function clobber($root: HTMLElement, ...children: Node[]): void;
-export function clobber($root: HTMLElement, ...children) {
+export function clobber($root, ...children) {
   const activeElement = document.activeElement as HTMLElement;
 
   if (children.length === 1 && Array.isArray(children[0])) {

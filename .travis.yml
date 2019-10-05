@@ -10,10 +10,6 @@ script:
   - "npm run-script tslint"
 
 before_deploy:
-  - "git config --local user.name 'Ben Mather'"
-  - "git config --local user.email 'bwhmather@bwhmather.com'"
-  - "export TRAVIS_TAG=$(npm list --depth 0 bdc | grep @ | sed -e 's/.*@\\([^ ]*\\) .*/\\1/')"
-  - "git tag $TRAVIS_TAG"
   - "npm pack"
 
 deploy:

@@ -9,11 +9,24 @@ script:
   - "npm run-script test"
   - "npm run-script tslint"
 
+before_deploy:
+  - "git config --local user.name 'Ben Mather'"
+  - "git config --local user.email 'bwhmather@bwhmather.com'"
+  - "export TRAVIS_TAG=${npm info bdc version}"
+  - "git tag $TRAVIS_TAG"
+  - "npm pack"
+
 deploy:
-  provider: npm
-  skip_cleanup: true
-  email: "bwhmather@bwhmather.com"
-  api_key:
-    secure: "i9u9y4QN31hAHyTET1S7SKTKgqATq0JAOGdZlXFxdC13QTtAwfZ3eGjwkTMHv+VMCQmkeWeuZEX54rUp80ynaF3dWulg1G+7Mq6ESZG9aUlvIDCFosfOptDNjs0kvg0H1sAuDftAVuuKFwC9RD3CCCEIiqj+OAajk059QZgfnxBGH8azNxyXHC9o4rcMj/nv27PYXckSDZHyXwX83no+7OQHsQf8kt7Qa3fviGHiaieWHh9FBbm2/6x5CYw4a/6TNqt8CzJOkz3gkKZSuV2TNKrGbxHBPa2gKk9X82ioqX9ZVt1Rm6Z09YQfzov/XqtXyzpRG06qKjHuEEZX9LaSSljsuIILa67wjOyJM8t4f0sGg2GsNoLc5mbZl6omt2EVZ7rsrr5ciWCwZfQC3e3eXImoMBv6YWofnX20rosxGx9D4ruUvO+BVEsTVvr2xDVaJpan7M6Tgos6uBRD9RxoUYV5ErqkMRRoCmQsGubHUfkfo43IB/D9+ISpkGC4zT4EkcY0SSh05e21JtoAPMNVntTBlAssmH8cfqaPvwA69cPqQmHH2mmrRLTL6Y/PkKxRmloT0cFfUgOHferGAljpkodb2oiXWe6W1WsTYZ8fvut/lL3wB0uAzX7IsuMX3SpI3LFahscSOe9AmERRj2AQ8pPnrZJs1EDQ7Q9fSoUlGDA="
-  on:
-    branch: "master"
+  - provider: releases
+    api_key:
+      secure: "e6veGzQ/v2p21Mlei8IhyHEPXBgKXKqBFrNpi20RTkViaWK+4pPyR3C6kAPkZuQDxGphS4luYiOFrJXpZD6/CFQkwtFPbUoW9TBb6fyZ2G9RI0I3NXSCOs23HFr5nUZETjbmA9FnKksUBm/ND/V4IZX8tDhYMVGWVy+LqaZkxc5h1PN72s4Iw+mtaNDsaHhknWVEFWc1MZ6t5dQwUeHuhUpvtkuh2EutLAFqflPw25rsG+PDcDrHdUO5y1yRNWU6VskAsngiXyr29RhjkBgVvztg/9YZgbzzuLcdcaybpbXFoDzn6FO1ahmRBXYlZqupSVxXjIAcS3ZKbyFmOmpiu77/tEu3E7WvK4sJ9cwmHWdsZq6J67o2rlTiz2pub8Tl1u0w4nNDNsuQQlCoFPPsEQu6is2lwnTIr/CzF8Lo1pAdOGtANFPE/2qrgiuBDCxY7+zmjEo/zBVICfSjKNzVFtkAKNhEskkG+S//0w0TMC0cEWtAr8ffFi51EDMnUxQYcM7Mb8Z4NLkWQjICBJOuVWPqFt5wUDrlaQiYG4MVWfCJL+Txz7aOW5Su1J3FvoDbZYRkvYuyd57CUYiBXdO25hKRl7K3ohoE4dxlRvylZIXcpaWhxpD0ya/qTyPr8/toeq+rRprASpXka2LqlwX/QAa/e3XUspcn4QGAPk90Elo="
+    file: "dist/bdc-${TRAVIS_TAG}.tgz"
+    on:
+      branch: "master"
+  - provider: npm
+    skip_cleanup: true
+    email: "bwhmather@bwhmather.com"
+    api_key:
+      secure: "i9u9y4QN31hAHyTET1S7SKTKgqATq0JAOGdZlXFxdC13QTtAwfZ3eGjwkTMHv+VMCQmkeWeuZEX54rUp80ynaF3dWulg1G+7Mq6ESZG9aUlvIDCFosfOptDNjs0kvg0H1sAuDftAVuuKFwC9RD3CCCEIiqj+OAajk059QZgfnxBGH8azNxyXHC9o4rcMj/nv27PYXckSDZHyXwX83no+7OQHsQf8kt7Qa3fviGHiaieWHh9FBbm2/6x5CYw4a/6TNqt8CzJOkz3gkKZSuV2TNKrGbxHBPa2gKk9X82ioqX9ZVt1Rm6Z09YQfzov/XqtXyzpRG06qKjHuEEZX9LaSSljsuIILa67wjOyJM8t4f0sGg2GsNoLc5mbZl6omt2EVZ7rsrr5ciWCwZfQC3e3eXImoMBv6YWofnX20rosxGx9D4ruUvO+BVEsTVvr2xDVaJpan7M6Tgos6uBRD9RxoUYV5ErqkMRRoCmQsGubHUfkfo43IB/D9+ISpkGC4zT4EkcY0SSh05e21JtoAPMNVntTBlAssmH8cfqaPvwA69cPqQmHH2mmrRLTL6Y/PkKxRmloT0cFfUgOHferGAljpkodb2oiXWe6W1WsTYZ8fvut/lL3wB0uAzX7IsuMX3SpI3LFahscSOe9AmERRj2AQ8pPnrZJs1EDQ7Q9fSoUlGDA="
+    on:
+      branch: "master"

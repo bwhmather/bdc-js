@@ -47,23 +47,29 @@ needed to make the two match.
 
 Using it inline is simple:
 
-    clobber($root, h("marquee", {}, "Hello"), ", ", h("blink", {}, "world"), "!");
+```javascript
+clobber($root, h("marquee", {}, "Hello"), ", ", h("blink", {}, "world"), "!");
+```
 
 When run, this example will update the `$root` to contain the following HTML:
 
-    <marquee>Hello</marquee>, <blink>world</blink>
-
+```html
+<marquee>Hello</marquee>, <blink>world</blink>
+```
 
 Both `h` and `clobber` can accept child nodes either as variadic arguments or 
 as a list.  The following two calls are equivalent:
 
-    h("ul", {}, [h("li", {}, "milk"), h("li", {}, "eggs"), h("li", {}, "binliners")])
-    h("ul", {}, h("li", {}, "milk"), h("li", {}, "eggs"), h("li", {}, "binliners"))
+```javascript
+h("ul", {}, [h("li", {}, "milk"), h("li", {}, "eggs"), h("li", {}, "binliners")])
+h("ul", {}, h("li", {}, "milk"), h("li", {}, "eggs"), h("li", {}, "binliners"))
+```
 
 Both will return a static tree that maps to the following html:
 
-    <ul><li>milk</li><li>eggs</li><li>binliners</li></ul>
-
+```html
+<ul><li>milk</li><li>eggs</li><li>binliners</li></ul>
+```
 
 
 ### Event Handlers

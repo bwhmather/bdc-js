@@ -6,13 +6,18 @@ addons:
   firefox: latest
 
 script:
+  - "git clean -xfd"
   - "npm run-script test"
   - "npm run-script tslint"
+  - "echo $(npm list --depth 0 bdc)"
+  - "export TRAVIS_TAG=$(npm list --depth 0 bdc | grep @ | sed -e 's/.*@\\([^ ]*\\) .*/\\1/')"
+  - "echo $TRAVIS_TAG"
 
 before_deploy:
   - "git config --local user.name 'Ben Mather'"
   - "git config --local user.email 'bwhmather@bwhmather.com'"
-  - "export TRAVIS_TAG=$(npm info bdc version)"
+  - "export TRAVIS_TAG=$(npm list --depth 0 bdc | grep @ | sed -e 's/.*@\\([^ ]*\\) .*/\\1/')"
+
   - "git tag $TRAVIS_TAG"
   - "npm pack"
 

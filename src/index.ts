@@ -291,11 +291,19 @@ function update(node, $parent, $cursor) {
   return $elem.nextSibling;
 }
 
-export type Node = {
-  type: string,
-  attributes: object,
-  children: Node[],
-} | string;
+export type Node = H | string;
+
+export class H {
+  type: string;
+  attributes: object;
+  children: Node[];
+
+  constructor(type: string, attributes: object, children: Node[]) {
+    this.type = type;
+    this.attributes = attributes;
+    this.children = children;
+  }
+}
 
 /**
  * Creates a node object describing a regular HTML element.
@@ -315,7 +323,8 @@ export function h(type, attributes, ...children) {
   if (children.length === 1 && Array.isArray(children[0])) {
     children = children[0];
   }
-  return { type, attributes, children };
+
+  return new H(type, attributes, children);
 }
 
 /**

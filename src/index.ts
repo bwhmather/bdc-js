@@ -158,17 +158,17 @@ function removeAttribute($elem, key) {
  *   A list of attribute names.
  */
 function listAttributes($elem) {
-  const attributes = [];
+  const attrs = [];
   // tslint:disable-next-line
   for (let i = 0; i < $elem.attributes.length; i++) {
-    attributes.push($elem.attributes[i].name);
+    attrs.push($elem.attributes[i].name);
   }
 
   Object.keys(EVENT_HANDLER_MAP.get($elem) || {}).forEach((eventName) => {
-    attributes.push("on" + eventName);
+    attrs.push("on" + eventName);
   });
 
-  return attributes;
+  return attrs;
 }
 
 /**
@@ -177,20 +177,20 @@ function listAttributes($elem) {
  *
  * @param $elem
  *   The HTML element to update the attributes of.
- * @param attributes
+ * @param attrs
  *   A plain JS object with keys corresponding to attributes in the target
  *   state of the element.
  */
-function updateAttributes($elem, attributes) {
+function updateAttributes($elem, attrs) {
   for (const attr of listAttributes($elem)) {
-    if (!attributes.hasOwnProperty(attr)) {
+    if (!attrs.hasOwnProperty(attr)) {
       removeAttribute($elem, attr);
     }
   }
 
-  for (const attr in attributes) {
-    if (attributes.hasOwnProperty(attr)) {
-      setAttribute($elem, attr, attributes[attr]);
+  for (const attr in attrs) {
+    if (attrs.hasOwnProperty(attr)) {
+      setAttribute($elem, attr, attrs[attr]);
     }
   }
 }
@@ -253,7 +253,7 @@ function update(node, $parent, $cursor) {
 
   } else {
     // Find matching element.
-    const nodeKey = node.attributes["x-bdc-key"] || null;
+    const nodeKey = node.attrs["x-bdc-key"] || null;
 
     while ($elem) {
       if ($elem.nodeType !== Node.TEXT_NODE) {
@@ -280,7 +280,7 @@ function update(node, $parent, $cursor) {
       $elem = document.createElement(node.type);
     }
 
-    updateAttributes($elem, node.attributes);
+    updateAttributes($elem, node.attrs);
     updateChildren($elem, node.children);
   }
 
@@ -295,12 +295,12 @@ export type Node = H | string;
 
 export class H {
   type: string;
-  attributes: object;
+  attrs: object;
   children: Node[];
 
-  constructor(type: string, attributes: object, children: Node[]) {
+  constructor(type: string, attrs: object, children: Node[]) {
     this.type = type;
-    this.attributes = attributes;
+    this.attrs = attrs;
     this.children = children;
   }
 }
@@ -310,7 +310,7 @@ export class H {
  *
  * @param type
  *   The element tag name.
- * @param attributes
+ * @param attrs
  *   An optional mapping from attribute names to target state values.  Must be
  *   a plain object.
  * @param children
@@ -320,12 +320,12 @@ export class H {
  */
 export function h(type: string, children: Node[]): Node;
 export function h(type: string, ...children: Node[]): Node;
-export function h(type: string, attributes: object, children: Node[]): Node;
-export function h(type: string, attributes: object, ...children: Node[]): Node;
+export function h(type: string, attrs: object, children: Node[]): Node;
+export function h(type: string, attrs: object, ...children: Node[]): Node;
 export function h(type, ...children) {
-  let attributes = {};
+  let attrs = {};
   if (children && children[0].constructor === Object) {
-    attributes = children[0];
+    attrs = children[0];
     children = children.slice(1);
   }
 
@@ -333,7 +333,7 @@ export function h(type, ...children) {
     children = children[0];
   }
 
-  return new H(type, attributes, children);
+  return new H(type, attrs, children);
 }
 
 /**

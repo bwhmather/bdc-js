@@ -311,15 +311,24 @@ export class H {
  * @param type
  *   The element tag name.
  * @param attributes
- *   A non-optional mapping from attribute names to target state values.
+ *   An optional mapping from attribute names to target state values.  Must be
+ *   a plain object.
  * @param children
  *   An arbitrary number of node objects or strings describing the children of
  *   this node.  Can be provided either as variadic arguments, or as a single
  *   array.
  */
+export function h(type: string, children: Node[]): Node;
+export function h(type: string, ...children: Node[]): Node;
 export function h(type: string, attributes: object, children: Node[]): Node;
 export function h(type: string, attributes: object, ...children: Node[]): Node;
-export function h(type, attributes, ...children) {
+export function h(type, ...children) {
+  let attributes = {};
+  if (children && children[0].constructor === Object) {
+    attributes = children[0];
+    children = children.slice(1);
+  }
+
   if (children.length === 1 && Array.isArray(children[0])) {
     children = children[0];
   }

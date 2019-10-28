@@ -164,9 +164,9 @@ function listAttributes($elem) {
     attrs.push($elem.attributes[i].name);
   }
 
-  Object.keys(EVENT_HANDLER_MAP.get($elem) || {}).forEach((eventName) => {
+  for (const eventName in EVENT_HANDLER_MAP.get($elem)) {
     attrs.push("on" + eventName);
-  });
+  }
 
   return attrs;
 }

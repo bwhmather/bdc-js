@@ -294,9 +294,9 @@ function update(node, $parent, $cursor) {
 export type Node = H | string;
 
 export class H {
-  type: string;
-  attrs: object;
-  children: Node[];
+  readonly type: string;
+  readonly attrs: object;
+  readonly children: Node[];
 
   constructor(type: string, attrs: object, children: Node[]) {
     this.type = type;

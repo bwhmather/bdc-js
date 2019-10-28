@@ -119,7 +119,7 @@ function setAttribute($elem, key, value) {
 function removeAttribute($elem, key) {
   if (key[0] === "o" && key[1] === "n") {
     const handlers = EVENT_HANDLER_MAP.get($elem);
-    if (typeof handlers !== "undefined") {
+    if (handlers !== undefined) {
       const eventName = key.slice(2);
 
       $elem.removeEventListener(eventName, handlers[eventName], false);

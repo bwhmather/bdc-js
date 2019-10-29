@@ -117,12 +117,12 @@ In the following example, the order of two inputs is switched while preserving
 input state and focus.
 
 ```javascript
-clobber($root, {}, h("ul", {}, [
+clobber($root, h("ul", {}, [
     h("li", {x-bdc-key: "a"}, h("input", {})),
     h("li", {x-bdc-key: "b"}, h("input", {})),
 ]));
 
-clobber($root, {}, h("ul", {}, [
+clobber($root, h("ul", {}, [
     h("li", {x-bdc-key: "b"}, h("input", {})),
     h("li", {x-bdc-key: "a"}, h("input", {})),
 ]));

@@ -6,17 +6,17 @@ Ben's DOM Clobberer
 BDC is a tiny javascript library for updating the html DOM to match a
 javascript description.
 
-Unlike libraries such as react, BDC tries to diff directly against the DOM.
+It weighs less that 1KiB when gzipped, and presents a simple API that makes it
+easy to describe HTML without needing to resort to JSX.
+
+Unlike libraries such as react, BDC does not have a component system.
+Instead it follows the Elm model and requires a complete description of the
+target state to be provided as a static data structure.
+BDC can be used with WebComponents if stateful sub-trees are required.
+
+BDC does not construct a virtual DOM, preferring to diff directly against
+the real thing.
 This results in a smaller, simpler, and probably much slower library.
-
-You should use BDC if:
-  - You really care about footprint.  BDC is less than 1KiB when gzipped.
-  - You would like an API that is useable without a build step.
-
-You should not use BDC if:
-  - You care about performance on large DOMs.
-  - You need to be able to embed components managed by other libraries.
-  - You would like to render SVG.
 
 BDC is currently under active development.  The API is unlikely to change
 significantly before 1.0, but there may still be bugs that need to be ironed

@@ -164,6 +164,7 @@ function listAttributes($elem) {
     attrs.push($elem.attributes[i].name);
   }
 
+  // tslint:disable-next-line
   for (const eventName in EVENT_HANDLER_MAP.get($elem)) {
     attrs.push("on" + eventName);
   }
@@ -327,7 +328,7 @@ export function h(type, ...children) {
   if (
     children.length &&
     !(children[0] instanceof H) &&
-    !(typeof children[0] === 'string')
+    !(typeof children[0] === "string")
   ) {
     attrs = children[0];
     children = children.slice(1);

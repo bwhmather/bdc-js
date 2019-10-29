@@ -10,7 +10,7 @@ Unlike libraries such as react, BDC tries to diff directly against the DOM.
 This results in a smaller, simpler, and probably much slower library.
 
 You should use BDC if:
-  - You really care about footprint.  BDC is less than 1KB when gzipped.
+  - You really care about footprint.  BDC is less than 1KiB when gzipped.
   - You would like an API that is useable without a build step.
 
 You should not use BDC if:

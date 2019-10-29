@@ -21,13 +21,55 @@ test("Empty div", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
-      bdc.h('div', {}),
+      bdc.h('div'),
     );
   });
 
   await t.expect($root.childElementCount).eql(1);
   await t.expect($root.child(0).tagName).eql('div');
   await t.expect($root.child(0).hasChildNodes).eql(false);
+  await t.expect($root.child(0).attributes).eql({});
+});
+
+test("Empty div with empty attributes", async t => {
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('div'),
+    );
+  });
+
+  await t.expect($root.childElementCount).eql(1);
+  await t.expect($root.child(0).tagName).eql('div');
+  await t.expect($root.child(0).hasChildNodes).eql(false);
+  await t.expect($root.child(0).attributes).eql({});
+});
+
+test("No attribute div with text child", async t => {
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('div', "contents"),
+    );
+  });
+
+  await t.expect($root.childElementCount).eql(1);
+  await t.expect($root.child(0).tagName).eql('div');
+  await t.expect($root.child(0).textContent).eql('contents');
+  await t.expect($root.child(0).attributes).eql({});
+});
+
+test("No attribute div with span child", async t => {
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('div', bdc.h('span')),
+    );
+  });
+
+  await t.expect($root.childElementCount).eql(1);
+  await t.expect($root.child(0).tagName).eql('div');
+  await t.expect($root.child(0).child(0).tagName).eql("span");
   await t.expect($root.child(0).attributes).eql({});
 });
 

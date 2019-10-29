@@ -3,8 +3,8 @@ Ben's DOM Clobberer
 
 [![Build Status](https://travis-ci.org/bwhmather/bdc-js.svg?branch=develop)](https://travis-ci.org/bwhmather/bdc-js)
 
-Yet another javascript library for updating the html DOM to match a javascript
-description.
+BDC is a tiny javascript library for updating the html DOM to match a
+javascript description.
 
 Unlike libraries such as react, BDC tries to diff directly against the DOM.
 This results in a smaller, simpler, and probably much slower library.

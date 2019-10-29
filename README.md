@@ -110,14 +110,8 @@ This is one place where BDC does sort-of resemble a vdom library.
 Nodes can be assigned a key by setting the `x-bdc-key` special attribute.
 When updating an element, for every child node BDC will search through each
 unmatched child element to find the first with the same type and key.
-This should mean that changes to nodes with the same key will affect the same
+This means that changes to nodes with the same key will affect the same
 element, even if the nodes are shuffled.
-
-This is essential for preserving input focus, and can potentially make updates faster, by minimizing changes if nodes are inserted.
-Please remember that while the algorithm that BDC uses to resolve the elements
-for keyed nodes is O(n) if the nodes and elements are in the same order, it
-is O(n^2) for arbitrary input.
-
 
 In the following example, the order of two inputs is switched while preserving
 input state and focus.
@@ -133,6 +127,13 @@ clobber($root, {}, h("ul", {}, [
     h("li", {x-bdc-key: "a"}, h("input", {})),
 ]));
 ```
+This feature is essential for preserving input focus, and can potentially make
+updates faster by minimizing changes if nodes are inserted.
+
+BDC uses an O(n^2) algorithm to figure out the mapping from keyed nodes to DOM,
+elements but real performance will be closer to O(n) if the elements are in
+approximately the right order.
+
 
 ### CSS
 

@@ -48,28 +48,45 @@ needed to make the two match.
 Using it inline is simple:
 
 ```javascript
-clobber(document.body, h("marquee", {}, "Hello"), ", ", h("blink", {}, "world"), "!");
+clobber(
+  document.body,
+  h("marquee", [
+    h("span", {"style": "font-weight: bold"}, "Hello"), ", ",
+    h("blink", "world"), "!",
+  ]),
+);
 ```
 
 When run, this example will update the body of the current document to contain
 the following HTML:
 
 ```html
-<marquee>Hello</marquee>, <blink>world</blink>
+<marquee>
+  <span style="font-weight: bold">Hello</span>, <blink>World</blink>!
+</marquee>
 ```
 
 Both `h` and `clobber` can accept child nodes either as variadic arguments or 
 as a list.  The following two calls are equivalent:
 
 ```javascript
-h("ul", {}, [h("li", {}, "milk"), h("li", {}, "eggs"), h("li", {}, "binliners")])
-h("ul", {}, h("li", {}, "milk"), h("li", {}, "eggs"), h("li", {}, "binliners"))
+h("ul", [h("li", ["milk"]), h("li", ["eggs"]), h("li", ["binliners"])]);
+h("ul", h("li", "milk"), h("li", "eggs"), h("li", "binliners"));
 ```
 
 Both will return a static tree that maps to the following html:
 
 ```html
 <ul><li>milk</li><li>eggs</li><li>binliners</li></ul>
+```
+
+Attributes can be set by passing an object as the second argument to `h`.
+There is not way to set attributes on the root element passed to clobber.
+
+This example will map to a `div` with `width` set to `"200px"`:
+
+``` javascript
+h("div", {height: "2000px"}, "TALL")
 ```
 
 
@@ -101,6 +118,44 @@ Please remember that while the algorithm that BDC uses to resolve the elements
 for keyed nodes is O(n) if the nodes and elements are in the same order, it
 is O(n^2) for arbitrary input.
 
+
+In the following example, the order of two inputs is switched while preserving
+input state and focus.
+
+```javascript
+clobber($root, {}, h("ul", {}, [
+    h("li", {x-bdc-key: "a"}, h("input", {})),
+    h("li", {x-bdc-key: "b"}, h("input", {})),
+]));
+
+clobber($root, {}, h("ul", {}, [
+    h("li", {x-bdc-key: "b"}, h("input", {})),
+    h("li", {x-bdc-key: "a"}, h("input", {})),
+]));
+```
+
+### CSS
+
+The style attribute is a string in HTML but is decoded to a data-structure in
+the DOM.  BDC requires you to set it as a string.
+
+
+### Preserving input state
+
+Applications built with BDC are required to listen for changes to input state
+and update the node DOM to match.  Failing to do so will result in the element
+DOM state being replaced the next time that `clobber` is called.
+
+
+### Web Components
+
+BDC does make some guarantees that the identity of the nodes that it manages
+will remain stable.
+
+It will, however, automatically remove modifications made by other code to the
+nodes that it is responsible for.
+
+Fortunately BDC integrates well with webcomponents.
 
 
 ## Contributing

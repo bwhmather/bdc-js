@@ -328,6 +328,7 @@ export function h(type, ...children) {
   if (
     children.length &&
     !(children[0] instanceof H) &&
+    !(children[0] instanceof Array) &&
     !(typeof children[0] === "string")
   ) {
     attrs = children[0];

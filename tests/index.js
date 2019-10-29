@@ -73,6 +73,20 @@ test("No attribute div with span child", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
+test("No attribute div with list of children", async t => {
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('div', [bdc.h('span')]),
+    );
+  });
+
+  await t.expect($root.childElementCount).eql(1);
+  await t.expect($root.child(0).tagName).eql('div');
+  await t.expect($root.child(0).child(0).tagName).eql("span");
+  await t.expect($root.child(0).attributes).eql({});
+});
+
 test("Clobber Variadic List", async t => {
   await t.eval(() => {
     bdc.clobber(

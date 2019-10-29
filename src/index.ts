@@ -324,7 +324,11 @@ export function h(type: string, attrs: object, children: Node[]): Node;
 export function h(type: string, attrs: object, ...children: Node[]): Node;
 export function h(type, ...children) {
   let attrs = {};
-  if (children && !(children[0] instanceof H)) {
+  if (
+    children.length &&
+    !(children[0] instanceof H) &&
+    !(typeof children[0] === 'string')
+  ) {
     attrs = children[0];
     children = children.slice(1);
   }

@@ -16,7 +16,7 @@
   "dependencies": {},
   "devDependencies": {
     "rollup": "^1.26.0",
-    "rollup-plugin-typescript2": "^0.25.1",
+    "rollup-plugin-typescript2": "^0.24.3",
     "rollup-plugin-uglify": "^6.0.3",
     "testcafe": "^1.6.0",
     "tslint": "^5.20.0",

@@ -29,6 +29,9 @@ Releases of BDC are published to npm.  They can be installed by running:
 
     npm install bdc
 
+The npm package contains Common-JS, ES6 and IIFE bundles of the library, as
+well as a type script definition file.
+
 Alternatively, prebuilt source files are pushed to github releases and can be
 saved and included directly in your project.
 

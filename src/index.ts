@@ -125,7 +125,7 @@ function removeAttribute($elem, key) {
       $elem.removeEventListener(eventName, handlers[eventName], false);
       delete handlers[eventName];
 
-      if (Object.keys(handlers).length === 0) {
+      if (!Object.keys(handlers).length) {
         // BDC no longer has any handlers linked listening for events from this
         // element.  We can clean up the empty entry.
         EVENT_HANDLER_MAP.delete($elem);
@@ -355,12 +355,31 @@ export function h(type, ...children) {
  */
 export function clobber($root: HTMLElement, children: Node[]): void;
 export function clobber($root: HTMLElement, ...children: Node[]): void;
+export function clobber(
+  $root: HTMLElement, attrs: object, children: Node[]
+): void;
+export function clobber(
+  $root: HTMLElement, attrs: object, ...children: Node[]
+): void;
 export function clobber($root, ...children) {
-  const activeElement = document.activeElement as HTMLElement;
+  let attrs = {};
+  if (
+    children.length &&
+    !(children[0] instanceof H) &&
+    !(children[0] instanceof Array) &&
+    !(typeof children[0] === "string")
+  ) {
+    attrs = children[0];
+    children = children.slice(1);
+  }
 
   if (children.length === 1 && Array.isArray(children[0])) {
     children = children[0];
   }
+
+  const activeElement = document.activeElement as HTMLElement;
+
+  updateAttributes($root, attrs);
   updateChildren($root, children);
 
   if (

@@ -1,0 +1,23 @@
+{
+  "private": true,
+  "name": "todomvc-bdc",
+  "description": "ToDoMVC - BDC",
+  "author": "Ben Mather <bwhmather@bwhmather.com> (bwhmather.com)",
+  "dependencies": {
+    "bdc": "^0.1.4",
+    "todomvc-app-css": "^2.0.0",
+    "todomvc-common": "^1.0.1"
+  },
+  "devDependencies": {
+    "rollup": "^1.26.0",
+    "rollup-plugin-typescript2": "^0.24.3",
+    "rollup-plugin-uglify": "^6.0.3",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "pretest": "npm run build",
+    "tslint": "tslint src/*.ts src/*/*.ts"
+  }
+}

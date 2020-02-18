@@ -1,5 +1,5 @@
 import typescript from 'rollup-plugin-typescript2';
-import { uglify } from 'rollup-plugin-uglify';
+import { terser } from 'rollup-plugin-terser';
 
 
 export default [
@@ -59,7 +59,7 @@ export default [
       typescript({
         abortOnError: false,
       }),
-      uglify(),
+      terser(),
     ],
     output: {
       format: 'iife',

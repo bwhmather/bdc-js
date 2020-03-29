@@ -87,6 +87,24 @@ test("No attribute div with list of children", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
+test("Clear attribute", async t => {
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('input', {type: 'number', step: '1000'})
+    );
+  });
+
+  await t.eval(() => {
+    bdc.clobber(
+      document.getElementById('root'),
+      bdc.h('input', {type: 'number'})
+    );
+  });
+
+  await t.expect($root.child(0).attributes).eql({type: 'number'});
+});
+
 test("Clobber Variadic List", async t => {
   await t.eval(() => {
     bdc.clobber(

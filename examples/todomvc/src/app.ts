@@ -66,15 +66,18 @@ function editItem(id: number) {
 }
 
 function handleHeaderKeyDown(evt: KeyboardEvent) {
-  if (evt.keyCode !== ENTER_KEY) {
-    return;
+  switch (evt.keyCode) {
+  case ENTER_KEY:
+    if (!newTodo.trim()) {
+      break;
+    }
+    addItem(newTodo.trim());
+    newTodo = "";
+
+    evt.preventDefault();
+    redraw();
+    break;
   }
-
-  addItem(newTodo.trim());
-  newTodo = "";
-
-  evt.preventDefault();
-  redraw();
 }
 
 function handleHeaderInput(evt: any) {

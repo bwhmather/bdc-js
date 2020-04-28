@@ -100,7 +100,7 @@ function renderHeader() {
   ]);
 }
 
-function handleItemDoubleClick(id: number, evt: any) {
+function handleItemDoubleClick(id: number, evt: MouseEvent) {
   editItem(id);
   redraw();
 
@@ -109,7 +109,7 @@ function handleItemDoubleClick(id: number, evt: any) {
 
 function handleItemKeyDown(id: number, evt: KeyboardEvent) {
   if (evt.keyCode === ENTER_KEY) {
-    let title = evt.target.value.trim();
+    let title = (evt.target! as HTMLInputElement).value.trim();
     if (!title) {
       removeItem(id);
     } else {
@@ -130,7 +130,7 @@ function handleItemKeyDown(id: number, evt: KeyboardEvent) {
   }
 }
 
-function handleItemInput(id: number, evt: any) {
+function handleItemInput(id: number, evt: Event) {
 
 }
 
@@ -150,14 +150,14 @@ function renderItem(item: TodoItem): Node {
         class: "toggle", type: "checkbox",
         checked: item.completed,
       }),
-      h("label", {ondblclick: (evt) => handleItemDoubleClick(id, evt)}, item.title),
+      h("label", {ondblclick: (evt: MouseEvent) => handleItemDoubleClick(id, evt)}, item.title),
       h("button", {class: "destroy"}),
     ]),
     h("input", {
       class: "edit",
       value: item.title,
-      onkeydown: (evt) => handleItemKeyDown(id, evt),
-      oninput: (evt) => handleItemInput(id, evt),
+      onkeydown: (evt: KeyboardEvent) => handleItemKeyDown(id, evt),
+      oninput: (evt: Event) => handleItemInput(id, evt),
     }),
   ]);
 }

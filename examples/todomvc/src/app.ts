@@ -130,8 +130,17 @@ function handleItemKeyDown(id: number, evt: KeyboardEvent) {
   }
 }
 
-function handleItemInput(id: number, evt: Event) {
+function handleItemBlur(id: number, evt: Event) {
+  let title = (evt.target! as HTMLInputElement).value.trim();
+  if (!title) {
+    removeItem(id);
+  } else {
+    setItemTitle(id, title);
+  }
+  redraw();
 
+  evt.preventDefault();
+  return;
 }
 
 function renderItem(item: TodoItem): Node {
@@ -157,7 +166,7 @@ function renderItem(item: TodoItem): Node {
       class: "edit",
       value: item.title,
       onkeydown: (evt: KeyboardEvent) => handleItemKeyDown(id, evt),
-      oninput: (evt: Event) => handleItemInput(id, evt),
+      onblur: (evt: Event) => handleItemBlur(id, evt),
     }),
   ]);
 }

@@ -43,6 +43,7 @@ function addItem(title: string) {
 
 function setItemTitle(id: number, title: string) {
   items[id].title = title;
+  items[id].editing = false;
 }
 
 function completeItem(id: number) {
@@ -58,6 +59,10 @@ function reactivateItem(id: number) {
 function removeItem(id: number) {
   delete items[id];
   reindex();
+}
+
+function editItem(id: number) {
+  items[id].editing = true;
 }
 
 function handleHeaderKeyDown(evt: KeyboardEvent) {
@@ -92,7 +97,43 @@ function renderHeader() {
   ]);
 }
 
+function handleItemDoubleClick(id: number, evt: any) {
+  editItem(id);
+  redraw();
+
+  evt.preventDefault();
+}
+
+function handleItemKeyDown(id: number, evt: KeyboardEvent) {
+  if (evt.keyCode === ENTER_KEY) {
+    let title = evt.target.value.trim();
+    if (!title) {
+      removeItem(id);
+    } else {
+      setItemTitle(id, title);
+    }
+    redraw();
+
+    evt.preventDefault();
+    return;
+  }
+
+  if (evt.keyCode === ESC_KEY) {
+    removeItem(id);
+    evt.preventDefault();
+
+    redraw();
+    return;
+  }
+}
+
+function handleItemInput(id: number, evt: any) {
+
+}
+
 function renderItem(item: TodoItem): Node {
+  const id = item.id;
+
   const classes = [];
   if (item.completed) {
     classes.push("completed");
@@ -100,17 +141,21 @@ function renderItem(item: TodoItem): Node {
   if (item.editing) {
     classes.push("editing");
   }
-
   return h("li", {class: classes.join(" ")}, [
     h("div", {class: "view"}, [
       h("input", {
         class: "toggle", type: "checkbox",
         checked: item.completed,
       }),
-      h("label", item.title),
+      h("label", {ondblclick: (evt) => handleItemDoubleClick(id, evt)}, item.title),
       h("button", {class: "destroy"}),
     ]),
-    h("input", {class: "edit", value: item.title}),
+    h("input", {
+      class: "edit",
+      value: item.title,
+      onkeydown: (evt) => handleItemKeyDown(id, evt),
+      oninput: (evt) => handleItemInput(id, evt),
+    }),
   ]);
 }
 

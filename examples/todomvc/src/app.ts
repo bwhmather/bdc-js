@@ -36,7 +36,7 @@ function reindex() {
 function addItem(title: string) {
   const item = new TodoItem();
   item.title = title;
-  items.push(item);
+  items[item.id] = item;
   reindex();
   return item.id;
 }

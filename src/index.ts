@@ -31,6 +31,11 @@
 // from event names to the functions BDC should call in response to them.
 const EVENT_HANDLER_MAP = new WeakMap();
 
+// Tracks which element should be focused when `clobber` finishes.  Will be
+// initialised to the currently focused element at the beginning of the run, and
+// replaced if by any new elements that are created with autofocus set to true.
+let $FOCUS_TARGET = null;
+
 /**
  * Sets an attribute or event handler on an HTML element to the requested
  * value.
@@ -279,6 +284,9 @@ function update(node, $parent, $cursor) {
       // Can't find an existing element of the right type to update.  Create a
       // new one.
       $elem = document.createElement(node.type);
+      if (node.autofocus) {
+        $FOCUSED_ELEMENT = $elem;
+      }
     }
 
     updateAttributes($elem, node.attrs);
@@ -356,7 +364,7 @@ export function h(type, ...children) {
 export function clobber($root: HTMLElement, children: Node[]): void;
 export function clobber($root: HTMLElement, ...children: Node[]): void;
 export function clobber($root, ...children) {
-  const activeElement = document.activeElement as HTMLElement;
+  $FOCUS_TARGET = document.activeElement as HTMLElement;
 
   if (children.length === 1 && Array.isArray(children[0])) {
     children = children[0];
@@ -364,10 +372,10 @@ export function clobber($root, ...children) {
   updateChildren($root, children);
 
   if (
-    activeElement != null &&
-    document.activeElement !== activeElement &&
-    typeof activeElement.focus === "function"
+    $FOCUS_TARGET != null &&
+    document.activeElement !== $FOCUS_TARGET &&
+    typeof $FOCUS_TARGET.focus === "function"
   ) {
-    activeElement.focus({preventScroll: true});
+    $FOCUS_TARGET.focus({preventScroll: true});
   }
 }

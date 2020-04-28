@@ -159,7 +159,9 @@ function renderItem(item: TodoItem): Node {
         class: "toggle", type: "checkbox",
         checked: item.completed,
       }),
-      h("label", {ondblclick: (evt: MouseEvent) => handleItemDoubleClick(id, evt)}, item.title),
+      h("label", {
+        ondblclick: (evt: MouseEvent) => handleItemDoubleClick(id, evt)
+      }, item.title),
       h("button", {class: "destroy"}),
     ]),
     h("input", {

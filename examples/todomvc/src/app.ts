@@ -23,14 +23,14 @@ function reindex() {
   completed = 0;
   remaining = 0;
   total = 0;
-  for (const item of items) {
+  items.forEach((item) => {
     if (item.completed) {
       completed += 1;
     } else {
       remaining += 1;
     }
     total += 1;
-  }
+  });
 }
 
 function addItem(title: string) {

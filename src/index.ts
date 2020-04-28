@@ -206,9 +206,9 @@ function updateAttributes($elem, attrs) {
  */
 function updateChildren($elem, children) {
   let $cursor = $elem.firstChild;
-  for (const childNode of children) {
+  children.forEach(childNode => {
     $cursor = update(childNode, $elem, $cursor);
-  }
+  });
 
   // Remove any trailing elements.
   while ($cursor) {

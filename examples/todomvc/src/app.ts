@@ -1,4 +1,4 @@
-import { clobber, h } from "bdc";
+import { clobber, h, Node } from "bdc";
 
 const ENTER_KEY = 13;
 const ESC_KEY = 27;
@@ -92,7 +92,7 @@ function renderHeader() {
   ]);
 }
 
-function renderItem(item: TodoItem) {
+function renderItem(item: TodoItem): Node {
   const classes = [];
   if (item.completed) {
     classes.push("completed");
@@ -114,7 +114,7 @@ function renderItem(item: TodoItem) {
   ]);
 }
 
-function renderMain() {
+function renderMain(): Node {
   return h("section", {class: "main"}, [
     h("input", {class: "toggle-all", id: "toggle-all", type: "checkbox"}),
     h("label", {for: "toggle-all"}, "Mark all as complete"),
@@ -124,7 +124,7 @@ function renderMain() {
   ]);
 }
 
-function renderFooter() {
+function renderFooter(): Node {
   if (!total) {
     return "";
   }
@@ -148,7 +148,7 @@ function renderFooter() {
   return h("footer", {class: "footer"}, contents);
 }
 
-export function render() {
+function render(): Node[] {
   return [
     renderHeader(),
     renderMain(),

@@ -153,8 +153,10 @@ function renderItem(item: TodoItem): Node {
   if (item.editing) {
     classes.push("editing");
   }
-  return h("li", {class: classes.join(" ")}, [
-    h("div", {class: "view"}, [
+
+  let inner;
+  if (!item.editing) {
+    inner = h("div", {class: "view"}, [
       h("input", {
         class: "toggle", type: "checkbox",
         checked: item.completed,
@@ -163,14 +165,17 @@ function renderItem(item: TodoItem): Node {
         ondblclick: (evt: MouseEvent) => handleItemDoubleClick(id, evt)
       }, item.title),
       h("button", {class: "destroy"}),
-    ]),
-    h("input", {
+    ]);
+  } else {
+    inner = h("input", {
       class: "edit",
       value: item.title,
       onkeydown: (evt: KeyboardEvent) => handleItemKeyDown(id, evt),
       onblur: (evt: Event) => handleItemBlur(id, evt),
-    }),
-  ]);
+      onmount: (evt: Event) => (evt.target! as HTMLInputElement).focus(),
+    });
+  }
+  return h("li", {class: classes.join(" ")}, inner);
 }
 
 function renderMain(): Node {

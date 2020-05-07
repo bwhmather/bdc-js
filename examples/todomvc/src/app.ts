@@ -216,9 +216,18 @@ function renderFooter(): Node {
   ]));
 
   contents.push(h("ul", {class: "filters"}, [
-    h("li", h("a", {class: "selected", href: "#/"}, "All")),
-    h("li", h("a", {href: "#/active"}, "Active")),
-    h("li", h("a", {href: "#/completed"}, "Completed")),
+    h("li", h("a", {
+      href: "#/",
+      class: showCompleted && showActive ? "selected" : "",
+    }, "All")),
+    h("li", h("a", {
+      href: "#/active",
+      class: !showCompleted && showActive ? "selected" : "",
+    }, "Active")),
+    h("li", h("a", {
+      href: "#/completed",
+      class: showCompleted && !showActive ? "selected" : "",
+    }, "Completed")),
   ]));
 
   if (completed) {

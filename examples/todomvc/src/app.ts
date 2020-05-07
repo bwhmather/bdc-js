@@ -159,6 +159,18 @@ function handleItemBlur(id: number, evt: Event) {
   return;
 }
 
+function handleItemStateToggled(id: number, evt: InputEvent) {
+  let checked = (evt.target! as HTMLInputElement).checked;
+  if (checked) {
+    completeItem(id);
+  } else {
+    reactivateItem(id);
+  }
+  redraw();
+
+  evt.preventDefault();
+}
+
 function renderItem(item: TodoItem): Node {
   const id = item.id;
 
@@ -175,6 +187,7 @@ function renderItem(item: TodoItem): Node {
     inner = h("div", {class: "view"}, [
       h("input", {
         class: "toggle", type: "checkbox",
+        onchange: (evt: InputEvent) => handleItemStateToggled(id, evt),
         checked: item.completed,
       }),
       h("label", {

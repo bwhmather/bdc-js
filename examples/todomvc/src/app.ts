@@ -62,6 +62,10 @@ function setItemTitle(id: number, title: string) {
   items[id].editing = false;
 }
 
+function cancelEditing(id: number) {
+  items[id].editing = false;
+}
+
 function completeItem(id: number) {
   items[id].completed = true;
   reindex();
@@ -138,10 +142,10 @@ function handleItemKeyDown(id: number, evt: KeyboardEvent) {
   }
 
   if (evt.keyCode === ESC_KEY) {
-    removeItem(id);
-    evt.preventDefault();
-
+    cancelEditing(id);
     redraw();
+
+    evt.preventDefault();
     return;
   }
 }

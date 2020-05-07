@@ -7,6 +7,9 @@ let newTodo = "";
 
 let nextItemId: number = 1;
 
+let showCompleted: boolean = true;
+let showActive: boolean = true;
+
 class TodoItem {
   id: number = nextItemId++;
   completed: boolean = false;
@@ -15,6 +18,9 @@ class TodoItem {
 }
 
 const items: TodoItem[] = [];
+
+/* Derived state */
+let visibleItems: TodoItem[] = [];
 let completed: number;
 let remaining: number;
 let total: number;
@@ -23,7 +29,17 @@ function reindex() {
   completed = 0;
   remaining = 0;
   total = 0;
+  visibleItems = [];
+
   items.forEach((item) => {
+    if (showCompleted && item.completed) {
+      visibleItems.push(item);
+    }
+
+    if (showActive && !item.completed) {
+      visibleItems.push(item);
+    }
+
     if (item.completed) {
       completed += 1;
     } else {
@@ -182,7 +198,7 @@ function renderMain(): Node {
   return h("section", {class: "main"}, [
     h("input", {class: "toggle-all", id: "toggle-all", type: "checkbox"}),
     h("label", {for: "toggle-all"}, "Mark all as complete"),
-    h("ul", {class: "todo-list"}, items.map((item) => {
+    h("ul", {class: "todo-list"}, visibleItems.map((item) => {
       return renderItem(item);
     }))
   ]);
@@ -233,7 +249,35 @@ function redraw() {
   }
 }
 
+function handleHashChanged() {
+  switch (location.hash) {
+  default:
+    history.replaceState(null, 'All', '#/');
+    return;
+
+  case '#/':
+    showCompleted = true;
+    showActive = true;
+    break;
+
+  case '#/active':
+    showCompleted = false;
+    showActive = true;
+    break;
+
+  case '#/completed':
+    showCompleted = true;
+    showActive = false;
+    break;
+  }
+
+  reindex();
+  redraw();
+}
+
 export function install($newRoot: HTMLElement) {
   $root = $newRoot;
+  window.addEventListener("hashchange", handleHashChanged, false);
+
   redraw();
 }

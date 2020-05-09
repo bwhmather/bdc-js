@@ -85,6 +85,15 @@ function editItem(id: number) {
   items[id].editing = true;
 }
 
+function clearCompleted() {
+  items.forEach((item, id) => {
+    if (item.completed) {
+      delete items[id];
+    }
+  });
+  reindex();
+}
+
 function handleHeaderKeyDown(evt: KeyboardEvent) {
   switch (evt.keyCode) {
   case ENTER_KEY:
@@ -175,6 +184,12 @@ function handleItemStateToggled(id: number, evt: InputEvent) {
   evt.preventDefault();
 }
 
+function handleClearCompletedClicked(evt: InputEvent) {
+  clearCompleted();
+  redraw();
+  evt.preventDefault();
+}
+
 function renderItem(item: TodoItem): Node {
   const id = item.id;
 
@@ -248,7 +263,10 @@ function renderFooter(): Node {
   ]));
 
   if (completed) {
-    contents.push(h("button", {class: "clear-completed"}, "Clear completed"));
+    contents.push(h("button", {
+        class: "clear-completed",
+        onclick: handleClearCompletedClicked,
+    }, "Clear completed"));
   }
 
   return h("footer", {class: "footer"}, contents);

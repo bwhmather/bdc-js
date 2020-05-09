@@ -76,6 +76,20 @@ function reactivateItem(id: number) {
   reindex();
 }
 
+function completeAll() {
+  items.forEach((item) => {
+    item.completed = true;
+  });
+  reindex();
+}
+
+function reactivateAll() {
+  items.forEach((item) => {
+    item.completed = false;
+  });
+  reindex();
+}
+
 function removeItem(id: number) {
   delete items[id];
   reindex();
@@ -226,6 +240,16 @@ function renderItem(item: TodoItem): Node {
   return h("li", {class: classes.join(" ")}, inner);
 }
 
+function handleToggleAllChanged(evt: InputEvent) {
+  if ((evt.target! as HTMLInputElement).checked) {
+    completeAll();
+  } else {
+    reactivateAll();
+  }
+  redraw();
+  evt.preventDefault();
+}
+
 function renderMain(): Node {
   return h("section", {class: "main"}, [
     h("input", {
@@ -233,6 +257,7 @@ function renderMain(): Node {
       id: "toggle-all",
       type: "checkbox",
       checked: completed && !remaining,
+      onchange: handleToggleAllChanged,
     }),
     h("label", {for: "toggle-all"}, "Mark all as complete"),
     h("ul", {class: "todo-list"}, visibleItems.map((item) => {

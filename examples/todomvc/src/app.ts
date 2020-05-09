@@ -228,7 +228,12 @@ function renderItem(item: TodoItem): Node {
 
 function renderMain(): Node {
   return h("section", {class: "main"}, [
-    h("input", {class: "toggle-all", id: "toggle-all", type: "checkbox"}),
+    h("input", {
+      class: "toggle-all",
+      id: "toggle-all",
+      type: "checkbox",
+      checked: completed && !remaining,
+    }),
     h("label", {for: "toggle-all"}, "Mark all as complete"),
     h("ul", {class: "todo-list"}, visibleItems.map((item) => {
       return renderItem(item);

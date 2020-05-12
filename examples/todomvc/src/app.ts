@@ -234,7 +234,7 @@ function renderItem(item: TodoItem): Node {
       value: item.title,
       onkeydown: (evt: KeyboardEvent) => handleItemKeyDown(id, evt),
       onblur: (evt: Event) => handleItemBlur(id, evt),
-      onmount: (evt: Event) => (evt.target! as HTMLInputElement).focus(),
+      autofocus: true,
     });
   }
   return h("li", {class: classes.join(" ")}, inner);

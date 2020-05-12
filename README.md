@@ -141,6 +141,15 @@ worst case, O(n^2) in the number of nodes.
 If the elements are in approximately the right order, real performance will be
 closer to O(n).
 
+
+### Autofocus
+
+BDC will automatically focus the last new element created with `autofocus` set
+to true.  If `autofocus` is set on an already existing element, it will have no
+effect.  If no new elements are created with `autofocus` set to true, BDC will
+preserve the current focus.
+
+
 ### CSS
 
 The style attribute is a string in HTML but is decoded to a data-structure in

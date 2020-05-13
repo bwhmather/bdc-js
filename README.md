@@ -91,7 +91,7 @@ Both will return a static tree that maps to the following html:
 ```
 
 Attributes can be set by passing an object as the second argument to `h`.
-There is not way to set attributes on the root element passed to clobber.
+There is no way to set attributes on the root element passed to clobber.
 
 This example will map to a `div` with `width` set to `"200px"`:
 

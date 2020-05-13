@@ -3,8 +3,8 @@ Ben's DOM Clobberer
 
 [![Build Status](https://travis-ci.org/bwhmather/bdc-js.svg?branch=develop)](https://travis-ci.org/bwhmather/bdc-js)
 
-BDC is a tiny javascript library for updating the html DOM to match a
-javascript description.
+Ben's DOM Clobberer (BDC) is a tiny javascript library for updating the html DOM
+to match a javascript description.
 
 It weighs less that 1KiB when gzipped, and presents a simple API that makes it
 easy to describe HTML without needing to resort to JSX.

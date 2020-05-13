@@ -18,6 +18,13 @@ BDC does not construct a virtual DOM, preferring to diff directly against
 the real thing.
 This results in a smaller, simpler, and probably much slower library.
 
+It is a good choice for small projects that are too dynamic to complete easily
+using vanilla javascript, but where a complex build setup and tens of megabytes
+of compiled code would be overkill.
+It is a bad choice for pages that must repeatedly re-render a large amount of
+dynamic data, and for more complicated applications where you may benefit from
+the larger ecosystem around other libraries.
+
 BDC is currently under active development.  The API is unlikely to change
 significantly before 1.0, but there may still be bugs that need to be ironed
 out.

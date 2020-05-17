@@ -67,8 +67,8 @@ clobber(
 );
 ```
 
-When run, this example will update the body of the current document to contain
-the following HTML:
+When run, this example will update the DOM of the current document to be match
+what would result from the following HTML:
 
 ```html
 <marquee>

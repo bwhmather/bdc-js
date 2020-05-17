@@ -165,9 +165,20 @@ the DOM.  BDC requires you to set it as a string.
 
 ### Preserving input state
 
+Values set by BDC will take priority over previous changes by the user.
+
+Internally, BDC uses DOM property assignment wherever possible, only falling
+back to `setAttribute` if the element doesn't export the property of interest.
+This [article](https://javascript.info/dom-attributes-and-properties) is a good
+resource if you would like to learn more about the difference.
+
 Applications built with BDC are required to listen for changes to input state
 and update the node DOM to match.  Failing to do so will result in the element
 DOM state being replaced the next time that `clobber` is called.
+
+It is very often acceptible to be lazy about this.  If you can be certain that
+no other events will trigger a clobber, listening for the `onchange` event
+instead of `oninput` can be a reasonable optimisation.
 
 
 ### Web Components

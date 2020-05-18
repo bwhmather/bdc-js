@@ -158,9 +158,13 @@ preserve the current focus.
 
 
 ### CSS
+The `style` attribute is a string, as most users would expect, but is
+implemented as a special case and therefore deserves mention.
 
-The style attribute is a string in HTML but is decoded to a data-structure in
-the DOM.  BDC requires you to set it as a string.
+While most attributes have fairly straightforward DOM property counterparts,
+`style` us parsed and exposed as a [CSSStyleDeclarationProperty](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration).
+Rather than expect users to construct on of these for each render, BDC will set
+the existing objects `cssText` property to match what the user passes.
 
 
 ### Preserving input state

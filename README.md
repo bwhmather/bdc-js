@@ -100,6 +100,24 @@ h("div", {height: "2000px"}, "TALL")
 ```
 
 
+### Preserving input state
+
+Values set by BDC will take priority over previous changes by the user.
+
+Internally, BDC uses DOM property assignment wherever possible, only falling
+back to `setAttribute` if the element doesn't export the property of interest.
+This [article](https://javascript.info/dom-attributes-and-properties) is a good
+resource if you would like to learn more about the difference.
+
+Applications built with BDC are required to listen for changes to input state
+and update the node DOM to match.  Failing to do so will result in the element
+DOM state being replaced the next time that `clobber` is called.
+
+It is very often acceptible to be lazy about this.  If you can be certain that
+no other events will trigger a clobber, listening for the `onchange` event
+instead of `oninput` can be a reasonable optimisation.
+
+
 ### Event Handlers
 
 Attributes prefixed with `on` are treated as event handlers.
@@ -158,6 +176,7 @@ preserve the current focus.
 
 
 ### CSS
+
 The `style` attribute is a string, as most users would expect, but is
 implemented as a special case and therefore deserves mention.
 
@@ -165,24 +184,6 @@ While most attributes have fairly straightforward DOM property counterparts,
 `style` us parsed and exposed as a [CSSStyleDeclarationProperty](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration).
 Rather than expect users to construct on of these for each render, BDC will set
 the existing objects `cssText` property to match what the user passes.
-
-
-### Preserving input state
-
-Values set by BDC will take priority over previous changes by the user.
-
-Internally, BDC uses DOM property assignment wherever possible, only falling
-back to `setAttribute` if the element doesn't export the property of interest.
-This [article](https://javascript.info/dom-attributes-and-properties) is a good
-resource if you would like to learn more about the difference.
-
-Applications built with BDC are required to listen for changes to input state
-and update the node DOM to match.  Failing to do so will result in the element
-DOM state being replaced the next time that `clobber` is called.
-
-It is very often acceptible to be lazy about this.  If you can be certain that
-no other events will trigger a clobber, listening for the `onchange` event
-instead of `oninput` can be a reasonable optimisation.
 
 
 ### Web Components

@@ -12,6 +12,7 @@
   },
   "main": "dist/bdc.umd.js",
   "module": "dist/bdc.mjs",
+  "jsnext:main": "dist/bdc.mjs",
   "types": "dist/types/index.d.ts",
   "dependencies": {},
   "devDependencies": {

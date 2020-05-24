@@ -351,6 +351,8 @@ function handleHashChanged() {
 
 export function install($newRoot: HTMLElement) {
   $root = $newRoot;
+
+  handleHashChanged();
   window.addEventListener("hashchange", handleHashChanged, false);
 
   redraw();

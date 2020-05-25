@@ -1,0 +1,22 @@
+name: Continuous integration workflow
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - run: npm install
+      - run: npm run build
+      - run: npm test
+        env:
+          CI: true
+      - run: npm run tslint
+      - run: npm pack
+      - uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: bdc-*.tgz
+

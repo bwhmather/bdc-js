@@ -113,7 +113,7 @@ Applications built with BDC are required to listen for changes to input state
 and update the node DOM to match.  Failing to do so will result in the element
 DOM state being replaced the next time that `clobber` is called.
 
-It is very often acceptible to be lazy about this.  If you can be certain that
+It is very often acceptable to be lazy about this.  If you can be certain that
 no other events will trigger a clobber, listening for the `onchange` event
 instead of `oninput` can be a reasonable optimisation.
 

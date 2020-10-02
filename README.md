@@ -120,7 +120,27 @@ instead of `oninput` can be a reasonable optimisation.
 
 ### Event Handlers
 
-Attributes prefixed with `on` are treated as event handlers.
+Attributes prefixed with `on` are bound as event handlers.
+
+BDC expects event handlers to be function objects, not strings.  Event handlers
+are called in exactly the same way as if they had been bound using the
+`addEventListener` method.
+
+```javascript
+let red = false;
+
+function onclick(evt) {
+    red = !red;
+    redraw();
+    evt.preventDefault();
+}
+
+function redraw() {
+    let style = red ? 'color: red;' : '';
+    clobber(document.body, h("button", {onclick: onclick, style: style}, 'Click!'));
+}
+redraw();
+```
 
 Event handlers are a special case because the DOM API provides no way to
 enumerate event handlers bound to an element.

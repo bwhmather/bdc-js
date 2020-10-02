@@ -209,7 +209,7 @@ the existing objects `cssText` property to match what the user passes.
 ### Web Components
 
 BDC does make some guarantees that the identity of the nodes that it manages
-will remain stable.
+will remain stable (see [Keyed Updates](#keyed-updates)).
 
 It will, however, automatically remove modifications made by other code to the
 nodes that it is responsible for.

@@ -1,10 +1,106 @@
-import { Selector } from 'testcafe';
+const http = require("http");
+const fs = require("fs");
+const url = require("url");
 
-fixture("Rendering").page("./fixture.html")
+const { test, skip } = require("zora");
+const webdriver = require("selenium-webdriver");
 
-const $root = Selector('#root');
+function sendFile(filepath, contentType, res) {
+  console.log(filepath)
+  fs.readFile(filepath, function(err, data) {
+    if (err) {
+      res.statusCode = 500;
+      res.end('Error getting file');
+      return;
+    }
+
+    res.setHeader('Content-Type', contentType);
+    res.end(data);
+  });
+}
+
+function serveFixtures(req, res) {
+  const filepath = url.parse(req.url).pathname;
+
+  switch (filepath) {
+  case '/':
+    return sendFile('tests/fixture.html', 'text/html', res);
+
+  case '/bdc.js':
+    return sendFile('dist/bdc.js', 'text/javascript', res);
+
+  default:
+    res.statusCode = 404;
+    res.end('Not Found');
+    return;
+  }
+};
+
+async function withDriver(callback) {
+  const server = http.createServer(serveFixtures);
+  await server.listen(0, '127.0.0.1');
+
+  const serverAddress = server.address();
+  const serverUrl = `http://${serverAddress.address}:${serverAddress.port}`;
+
+  const driver = new webdriver.Builder().forBrowser("firefox").build();
+
+  try {
+    await driver.get(serverUrl);
+    await callback(driver);
+  } finally {
+    driver.quit();
+    server.close();
+  }
+}
+
+async function selectRoot(driver) {
+  return await driver.findElement(webdriver.By.id('root'));
+}
+
+async function selectChildren(element) {
+  return await element.findElements(webdriver.By.xpath(".//*"));
+}
 
 test("Hello world", async t => {
+  await withDriver(async driver => {
+    await driver.executeScript(() => {
+      bdc.clobber($root, h('h1', 'Hello, World!'));
+    });
+
+    const $root = await selectRoot(driver);
+    const $children = await selectChildren($root);
+    const $h1 = $children[0];
+
+    t.eq($children.length, 1);
+    t.eq((await selectChildren($h1)).length, 0);
+    t.eq(await $h1.getText(), "Hello, World!")
+  })
+});
+
+test("Empty div", async t => {
+  await withDriver(async driver => {
+    await driver.executeScript(() => {
+      bdc.clobber(
+        document.getElementById('root'),
+        bdc.h('div'),
+      );
+    });
+
+    const $root = await selectRoot(driver);
+    const $rootChildren = await selectChildren($root);
+    const $div = $rootChildren[0];
+    const $divChildren = await selectChildren($div);
+
+    t.eq($rootChildren.length, 1);
+    t.eq($divChildren.length, 0);
+    t.eq(await $div.getTagName(), "div");
+  });
+});
+
+// const $root = Selector('#root');
+
+skip("Hello world", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -17,7 +113,7 @@ test("Hello world", async t => {
   await t.expect($root.childNodeCount).eql(1);
 });
 
-test("Empty div", async t => {
+skip("Empty div", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -31,7 +127,7 @@ test("Empty div", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
-test("Empty div with empty attributes", async t => {
+skip("Empty div with empty attributes", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -45,7 +141,7 @@ test("Empty div with empty attributes", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
-test("No attribute div with text child", async t => {
+skip("No attribute div with text child", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -59,7 +155,7 @@ test("No attribute div with text child", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
-test("No attribute div with span child", async t => {
+skip("No attribute div with span child", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -73,7 +169,7 @@ test("No attribute div with span child", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
-test("No attribute div with list of children", async t => {
+skip("No attribute div with list of children", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -87,7 +183,7 @@ test("No attribute div with list of children", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
-test("Clobber Variadic List", async t => {
+skip("Clobber Variadic List", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -103,7 +199,7 @@ test("Clobber Variadic List", async t => {
   await t.expect($root.child(2).textContent).eql("item 3");
 });
 
-test("Clobber Array List", async t => {
+skip("Clobber Array List", async t => {
   await t.eval(() => {
     bdc.clobber(document.getElementById('root'), [
       bdc.h('li', {}, "item 1"),
@@ -118,7 +214,7 @@ test("Clobber Array List", async t => {
   await t.expect($root.child(2).textContent).eql("item 3");
 });
 
-test("Clobber Keyed List", async t => {
+skip("Clobber Keyed List", async t => {
   await t.eval(() => {
     bdc.clobber(document.getElementById('root'), [
       bdc.h('div', {'x-bdc-key': 'a'}, bdc.h('input', {})),
@@ -143,7 +239,7 @@ test("Clobber Keyed List", async t => {
   await t.expect($root.child(1).child('input').focused).eql(true);
 });
 
-test("Variadic List", async t => {
+skip("Variadic List", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -163,7 +259,7 @@ test("Variadic List", async t => {
   await t.expect($root.child(0).child(2).textContent).eql("item 3");
 });
 
-test("Array List", async t => {
+skip("Array List", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -183,7 +279,7 @@ test("Array List", async t => {
   await t.expect($root.child(0).child(2).textContent).eql("item 3");
 });
 
-test("Keyed List", async t => {
+skip("Keyed List", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -214,7 +310,7 @@ test("Keyed List", async t => {
   await t.expect($root.child('ul').child(1).child('input').focused).eql(true);
 });
 
-test("Link", async t => {
+skip("Link", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -228,7 +324,7 @@ test("Link", async t => {
   await t.expect(uri).match(/#success$/);
 });
 
-test("Booleans", async t => {
+skip("Booleans", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -239,7 +335,7 @@ test("Booleans", async t => {
   await t.expect($root.child(0).attributes).eql({'x-b': ""});
 });
 
-test("Swapping", async t => {
+skip("Swapping", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -263,7 +359,7 @@ test("Swapping", async t => {
   await t.expect($root.child(1).textContent).eql("Bold");
 });
 
-test("Removing attributes", async t => {
+skip("Removing attributes", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -281,7 +377,7 @@ test("Removing attributes", async t => {
   await t.expect($root.child(0).attributes).eql({'x-b': "new"});
 });
 
-test("Event handlers", async t => {
+skip("Event handlers", async t => {
   // Set an event handler.
   await t.eval(() => {
     bdc.clobber(
@@ -299,7 +395,7 @@ test("Event handlers", async t => {
   await t.expect($root.child(0).attributes).eql({'x-clicked': ""});
 });
 
-test("Removing event handlers", async t => {
+skip("Removing event handlers", async t => {
   // Set an event handler.
   await t.eval(() => {
     bdc.clobber(
@@ -325,7 +421,7 @@ test("Removing event handlers", async t => {
   await t.expect($root.child(0).attributes).eql({});
 });
 
-test("Replacing event handlers", async t => {
+skip("Replacing event handlers", async t => {
   // Set an event handler.
   await t.eval(() => {
     bdc.clobber(
@@ -353,7 +449,7 @@ test("Replacing event handlers", async t => {
   await t.expect($root.child(0).attributes).eql({'x-new-clicked': ""});
 });
 
-test("Restoring event handlers", async t => {
+skip("Restoring event handlers", async t => {
   // Set an event handler.
   await t.eval(() => {
     bdc.clobber(
@@ -389,7 +485,7 @@ test("Restoring event handlers", async t => {
   await t.expect($root.child(0).attributes).eql({'x-clicked': ""});
 });
 
-test("Re-apply input value preserves cursor", async t => {
+skip("Re-apply input value preserves cursor", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -413,7 +509,7 @@ test("Re-apply input value preserves cursor", async t => {
   await t.expect($root.child(0).value).eql("ba");
 });
 
-test("No injection on create text node", async t => {
+skip("No injection on create text node", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),
@@ -427,7 +523,7 @@ test("No injection on create text node", async t => {
   );
 });
 
-test("No injection on update text node", async t => {
+skip("No injection on update text node", async t => {
   await t.eval(() => {
     bdc.clobber(
       document.getElementById('root'),

@@ -16,18 +16,20 @@
   "types": "dist/types/index.d.ts",
   "dependencies": {},
   "devDependencies": {
+    "faucet": "0.0.1",
     "rollup": "^2.22.0",
     "rollup-plugin-terser": "^6.1.0",
     "rollup-plugin-typescript2": "^0.27.1",
-    "testcafe": "^1.8.8",
+    "selenium-webdriver": "^4.0.0-alpha.7",
     "tslint": "^6.1.2",
     "typescript": "^3.9.7",
-    "typescript-formatter": "^7.2.2"
+    "typescript-formatter": "^7.2.2",
+    "zora": "^4.0.0"
   },
   "scripts": {
     "build": "rollup -c",
     "pretest": "npm run build",
-    "test": "testcafe firefox:headless tests/index.js --no-color",
+    "test": "node tests/index.js | faucet",
     "tslint": "tslint -p tsconfig.json src/*.ts src/*/*.ts",
     "prepack": "npm run build"
   },

@@ -1,433 +1,681 @@
-import { Selector } from "testcafe";
+"use strict";
 
-fixture("Rendering").page("./fixture.html");
+const http = require("http");
+const fs = require("fs");
+const url = require("url");
 
-const $root = Selector("#root");
+const { test, skip } = require("zora");
+const playwright = require("playwright");
+
+const browserName = process.env.BROWSER || "firefox";
+
+function sendFile(filepath, contentType, res) {
+  console.log(filepath);
+  fs.readFile(filepath, function (err, data) {
+    if (err) {
+      res.statusCode = 500;
+      res.end("Error getting file");
+      return;
+    }
+
+    res.setHeader("Content-Type", contentType);
+    res.end(data);
+  });
+}
+
+function serveFixtures(req, res) {
+  const filepath = url.parse(req.url).pathname;
+
+  switch (filepath) {
+    case "/":
+      return sendFile("tests/fixture.html", "text/html", res);
+
+    case "/bdc.js":
+      return sendFile("dist/bdc.js", "text/javascript", res);
+
+    default:
+      res.statusCode = 404;
+      res.end("Not Found");
+      return;
+  }
+}
+
+async function withPage(callback) {
+  const server = http.createServer(serveFixtures);
+  await server.listen(0, "127.0.0.1");
+
+  const serverAddress = server.address();
+  const serverUrl = `http://${serverAddress.address}:${serverAddress.port}`;
+
+  const browser = await playwright[browserName].launch();
+  const page = await browser.newPage();
+
+  try {
+    await page.goto(serverUrl);
+    await callback(page);
+  } finally {
+    await page.close();
+    await browser.close();
+    server.close();
+  }
+}
+
+class ValueSelector {
+  #selectFn;
+
+  constructor(selectFn) {
+    this.#selectFn = selectFn;
+  }
+
+  async select(page) {
+    return await this.#selectFn(page);
+  }
+}
+
+class ElementSelector {
+  #query;
+
+  constructor(query) {
+    this.#query = query;
+  }
+
+  async select(page) {
+    return await page.$(this.#query);
+  }
+
+  async click(page) {
+    return await page.click(this.#query);
+  }
+
+  get tagName() {
+    return new ValueSelector(async (page) => {
+      return await page.$eval(this.#query, (element) => {
+        return element.localName;
+      });
+    });
+  }
+
+  get attributes() {
+    return new ValueSelector(async (page) => {
+      return await page.$eval(this.#query, (element) => {
+        const input = element.attributes;
+        const output = {};
+        for (let i = 0; i < input.length; i++) {
+          output[input[i].name] = input[i].value;
+        }
+        return output;
+      });
+    });
+  }
+
+  attribute(name) {
+    return new ValueSelector(async (page) => {
+      return await this.page.getAttribute(query, name);
+    });
+  }
+
+  property(name) {
+    return new ValueSelector(async (page) => {
+      return await page.$eval(
+        this.#query,
+        (element, name) => {
+          return element[name];
+        },
+        name
+      );
+    });
+  }
+
+  get children() {
+    return new ValueSelector(async (page) => {
+      return await page.$$(`${this.#query} > *`);
+    });
+  }
+
+  child(n, cls) {
+    if (typeof cls === "undefined") {
+      cls = "*";
+    }
+    return new ElementSelector(`${this.#query} > ${cls}:nth-child(${n + 1})`);
+  }
+
+  get childElementCount() {
+    return new ValueSelector(async (page) => {
+      const children = await select(page, this.children);
+      return children.length;
+    });
+  }
+
+  get childNodeCount() {
+    return new ValueSelector(async (page) => {
+      return await page.$eval(this.#query, (element) => {
+        let child = element.firstChild;
+        let count = 0;
+        while (child) {
+          count++;
+          child = child.nextSibling;
+        }
+        return count;
+      });
+    });
+  }
+
+  #apply(method) {
+    return new ValueSelector(async (page) => {
+      return await page[method](this.#query);
+    });
+  }
+
+  get textContent() {
+    return this.#apply("textContent");
+  }
+
+  get innerText() {
+    return this.#apply("innerText");
+  }
+  get innerHTML() {
+    return this.#apply("innerText");
+  }
+
+  get focused() {
+    return new ValueSelector(async (page) => {
+      return await page.$eval(this.#query, (element) => {
+        return element === document.activeElement;
+      });
+    });
+  }
+}
+
+// TODO need to guarantee that this only selects one element.
+const $root = new ElementSelector("#root");
+
+async function select(page, selector) {
+  return await selector.select(page);
+}
+
+async function click(page, selector) {
+  return await selector.click(page);
+}
 
 test("Hello world", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), "Hello, World!");
-  });
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber($root, "Hello, World!");
+    });
 
-  await t.expect($root.textContent).eql("Hello, World!");
-  await t.expect($root.hasChildElements).eql(false);
-  await t.expect($root.childNodeCount).eql(1);
+    t.eq(await select(page, $root.childNodeCount), 1);
+    t.eq(await select(page, $root.textContent), "Hello, World!");
+  });
 });
 
 test("Empty div", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), bdc.h("div"));
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(document.getElementById("root"), bdc.h("div"));
+    });
+
+    t.eq(await select(page, $root.childNodeCount), 1);
+    t.eq(await select(page, $root.child(0).tagName), "div");
+    t.eq(await select(page, $root.child(0).attributes), {});
+    t.eq(await select(page, $root.child(0).childNodeCount), 0);
   });
-
-  await t.expect($root.childElementCount).eql(1);
-  await t.expect($root.child(0).tagName).eql("div");
-  await t.expect($root.child(0).hasChildNodes).eql(false);
-  await t.expect($root.child(0).attributes).eql({});
-});
-
-test("Empty div with empty attributes", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), bdc.h("div"));
-  });
-
-  await t.expect($root.childElementCount).eql(1);
-  await t.expect($root.child(0).tagName).eql("div");
-  await t.expect($root.child(0).hasChildNodes).eql(false);
-  await t.expect($root.child(0).attributes).eql({});
 });
 
 test("No attribute div with text child", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), bdc.h("div", "contents"));
-  });
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(document.getElementById("root"), bdc.h("div", "contents"));
+    });
 
-  await t.expect($root.childElementCount).eql(1);
-  await t.expect($root.child(0).tagName).eql("div");
-  await t.expect($root.child(0).textContent).eql("contents");
-  await t.expect($root.child(0).attributes).eql({});
+    t.eq(await select(page, $root.childNodeCount), 1);
+    t.eq(await select(page, $root.child(0).tagName), "div");
+    t.eq(await select(page, $root.child(0).attributes), {});
+    t.eq(await select(page, $root.child(0).childNodeCount), 1);
+    t.eq(await select(page, $root.child(0).childElementCount), 0);
+    t.eq(await select(page, $root.child(0).textContent), "contents");
+  });
 });
 
 test("No attribute div with span child", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), bdc.h("div", bdc.h("span")));
-  });
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(document.getElementById("root"), bdc.h("div", bdc.h("span")));
+    });
 
-  await t.expect($root.childElementCount).eql(1);
-  await t.expect($root.child(0).tagName).eql("div");
-  await t.expect($root.child(0).child(0).tagName).eql("span");
-  await t.expect($root.child(0).attributes).eql({});
+    t.eq(await select(page, $root.childNodeCount), 1);
+    t.eq(await select(page, $root.child(0).tagName), "div");
+    t.eq(await select(page, $root.child(0).attributes), {});
+    t.eq(await select(page, $root.child(0).childNodeCount), 1);
+    t.eq(await select(page, $root.child(0).child(0).tagName), "span");
+    t.eq(await select(page, $root.child(0).child(0).attributes), {});
+    t.eq(await select(page, $root.child(0).child(0).childNodeCount), 0);
+  });
 });
 
 test("No attribute div with list of children", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), bdc.h("div", [bdc.h("span")]));
-  });
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("div", [bdc.h("span")])
+      );
+    });
 
-  await t.expect($root.childElementCount).eql(1);
-  await t.expect($root.child(0).tagName).eql("div");
-  await t.expect($root.child(0).child(0).tagName).eql("span");
-  await t.expect($root.child(0).attributes).eql({});
+    t.eq(await select(page, $root.childNodeCount), 1);
+    t.eq(await select(page, $root.child(0).tagName), "div");
+    t.eq(await select(page, $root.child(0).attributes), {});
+    t.eq(await select(page, $root.child(0).childNodeCount), 1);
+    t.eq(await select(page, $root.child(0).child(0).tagName), "span");
+    t.eq(await select(page, $root.child(0).child(0).attributes), {});
+    t.eq(await select(page, $root.child(0).child(0).childNodeCount), 0);
+  });
 });
 
 test("Clobber Variadic List", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("div", {}, "item 1"),
-      bdc.h("div", {}, "item 2"),
-      bdc.h("div", {}, "item 3")
-    );
-  });
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("div", {}, "item 1"),
+        bdc.h("div", {}, "item 2"),
+        bdc.h("div", {}, "item 3")
+      );
+    });
 
-  await t.expect($root.childElementCount).eql(3);
-  await t.expect($root.child(0).textContent).eql("item 1");
-  await t.expect($root.child(1).textContent).eql("item 2");
-  await t.expect($root.child(2).textContent).eql("item 3");
+    t.eq(await select(page, $root.childElementCount), 3);
+    t.eq(await select(page, $root.child(0).textContent), "item 1");
+    t.eq(await select(page, $root.child(1).textContent), "item 2");
+    t.eq(await select(page, $root.child(2).textContent), "item 3");
+  });
 });
 
 test("Clobber Array List", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), [
-      bdc.h("li", {}, "item 1"),
-      bdc.h("li", {}, "item 2"),
-      bdc.h("li", {}, "item 3"),
-    ]);
-  });
-
-  await t.expect($root.childElementCount).eql(3);
-  await t.expect($root.child(0).textContent).eql("item 1");
-  await t.expect($root.child(1).textContent).eql("item 2");
-  await t.expect($root.child(2).textContent).eql("item 3");
-});
-
-test("Clobber Keyed List", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), [
-      bdc.h("div", { "x-bdc-key": "a" }, bdc.h("input", {})),
-      bdc.h("div", { "x-bdc-key": "b" }, bdc.h("input", {})),
-      bdc.h("div", { "x-bdc-key": "c" }, bdc.h("input", {})),
-      bdc.h("div", { "x-bdc-key": "d" }, bdc.h("input", {})),
-      bdc.h("div", { "x-bdc-key": "e" }, bdc.h("input", {})),
-    ]);
-  });
-
-  await t.click($root.child(2).child("input"));
-
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), [
-      bdc.h("div", { "x-bdc-key": "d" }, bdc.h("input", {})),
-      bdc.h("div", { "x-bdc-key": "c" }, bdc.h("input", {})),
-      bdc.h("div", { "x-bdc-key": "b" }, bdc.h("input", {})),
-      bdc.h("div", { "x-bdc-key": "a" }, bdc.h("input", {})),
-    ]);
-  });
-
-  await t.expect($root.child(1).child("input").focused).eql(true);
-});
-
-test("Variadic List", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h(
-        "ul",
-        {},
-        bdc.h("li", {}, "item 1"),
-        bdc.h("li", {}, "item 2"),
-        bdc.h("li", {}, "item 3")
-      )
-    );
-  });
-
-  await t.expect($root.childElementCount).eql(1);
-  await t.expect($root.child(0).tagName).eql("ul");
-  await t.expect($root.child(0).childElementCount).eql(3);
-  await t.expect($root.child(0).child(0).textContent).eql("item 1");
-  await t.expect($root.child(0).child(1).textContent).eql("item 2");
-  await t.expect($root.child(0).child(2).textContent).eql("item 3");
-});
-
-test("Array List", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("ul", {}, [
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(document.getElementById("root"), [
         bdc.h("li", {}, "item 1"),
         bdc.h("li", {}, "item 2"),
         bdc.h("li", {}, "item 3"),
-      ])
-    );
-  });
+      ]);
+    });
 
-  await t.expect($root.childElementCount).eql(1);
-  await t.expect($root.child(0).tagName).eql("ul");
-  await t.expect($root.child(0).childElementCount).eql(3);
-  await t.expect($root.child(0).child(0).textContent).eql("item 1");
-  await t.expect($root.child(0).child(1).textContent).eql("item 2");
-  await t.expect($root.child(0).child(2).textContent).eql("item 3");
+    t.eq(await select(page, $root.childElementCount), 3);
+    t.eq(await select(page, $root.child(0).textContent), "item 1");
+    t.eq(await select(page, $root.child(1).textContent), "item 2");
+    t.eq(await select(page, $root.child(2).textContent), "item 3");
+  });
+});
+
+test("Clobber Keyed List", async (t) => {
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(document.getElementById("root"), [
+        bdc.h("div", { "x-bdc-key": "a" }, bdc.h("input", {})),
+        bdc.h("div", { "x-bdc-key": "b" }, bdc.h("input", {})),
+        bdc.h("div", { "x-bdc-key": "c" }, bdc.h("input", {})),
+        bdc.h("div", { "x-bdc-key": "d" }, bdc.h("input", {})),
+        bdc.h("div", { "x-bdc-key": "e" }, bdc.h("input", {})),
+      ]);
+    });
+
+    await click(page, $root.child(2).child(0, "input"));
+
+    await page.evaluate(() => {
+      bdc.clobber(document.getElementById("root"), [
+        bdc.h("div", { "x-bdc-key": "d" }, bdc.h("input", {})),
+        bdc.h("div", { "x-bdc-key": "c" }, bdc.h("input", {})),
+        bdc.h("div", { "x-bdc-key": "b" }, bdc.h("input", {})),
+        bdc.h("div", { "x-bdc-key": "a" }, bdc.h("input", {})),
+      ]);
+    });
+
+    t.eq(await select(page, $root.child(1).child(0, "input").focused), true);
+  });
+});
+
+test("Variadic List", async (t) => {
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h(
+          "ul",
+          {},
+          bdc.h("li", {}, "item 1"),
+          bdc.h("li", {}, "item 2"),
+          bdc.h("li", {}, "item 3")
+        )
+      );
+    });
+
+    t.eq(await select(page, $root.childElementCount), 1);
+    t.eq(await select(page, $root.child(0).tagName), "ul");
+    t.eq(await select(page, $root.child(0).childElementCount), 3);
+    t.eq(await select(page, $root.child(0).child(0).textContent), "item 1");
+    t.eq(await select(page, $root.child(0).child(1).textContent), "item 2");
+    t.eq(await select(page, $root.child(0).child(2).textContent), "item 3");
+  });
+});
+
+test("Array List", async (t) => {
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("ul", {}, [
+          bdc.h("li", {}, "item 1"),
+          bdc.h("li", {}, "item 2"),
+          bdc.h("li", {}, "item 3"),
+        ])
+      );
+    });
+
+    t.eq(await select(page, $root.childElementCount), 1);
+    t.eq(await select(page, $root.child(0).tagName), "ul");
+    t.eq(await select(page, $root.child(0).childElementCount), 3);
+    t.eq(await select(page, $root.child(0).child(0).textContent), "item 1");
+    t.eq(await select(page, $root.child(0).child(1).textContent), "item 2");
+    t.eq(await select(page, $root.child(0).child(2).textContent), "item 3");
+  });
 });
 
 test("Keyed List", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("ul", {}, [
-        bdc.h("li", { "x-bdc-key": "a" }, bdc.h("input", {})),
-        bdc.h("li", { "x-bdc-key": "b" }, bdc.h("input", {})),
-        bdc.h("li", { "x-bdc-key": "c" }, bdc.h("input", {})),
-        bdc.h("li", { "x-bdc-key": "d" }, bdc.h("input", {})),
-        bdc.h("li", { "x-bdc-key": "e" }, bdc.h("input", {})),
-      ])
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("ul", {}, [
+          bdc.h("li", { "x-bdc-key": "a" }, bdc.h("input", {})),
+          bdc.h("li", { "x-bdc-key": "b" }, bdc.h("input", {})),
+          bdc.h("li", { "x-bdc-key": "c" }, bdc.h("input", {})),
+          bdc.h("li", { "x-bdc-key": "d" }, bdc.h("input", {})),
+          bdc.h("li", { "x-bdc-key": "e" }, bdc.h("input", {})),
+        ])
+      );
+    });
+
+    await click(page, $root.child(0, "ul").child(2).child(0, "input"));
+
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("ul", {}, [
+          bdc.h("li", { "x-bdc-key": "d" }, bdc.h("input", {})),
+          bdc.h("li", { "x-bdc-key": "c" }, bdc.h("input", {})),
+          bdc.h("li", { "x-bdc-key": "b" }, bdc.h("input", {})),
+          bdc.h("li", { "x-bdc-key": "a" }, bdc.h("input", {})),
+        ])
+      );
+    });
+
+    t.eq(
+      await select(
+        page,
+        $root.child(0, "ul").child(1).child(0, "input").focused
+      ),
+      true
     );
   });
-
-  await t.click($root.child("ul").child(2).child("input"));
-
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("ul", {}, [
-        bdc.h("li", { "x-bdc-key": "d" }, bdc.h("input", {})),
-        bdc.h("li", { "x-bdc-key": "c" }, bdc.h("input", {})),
-        bdc.h("li", { "x-bdc-key": "b" }, bdc.h("input", {})),
-        bdc.h("li", { "x-bdc-key": "a" }, bdc.h("input", {})),
-      ])
-    );
-  });
-
-  await t.expect($root.child("ul").child(1).child("input").focused).eql(true);
 });
 
 test("Link", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("a", { href: "#success" }, "Add Fragment")
-    );
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("a", { href: "#success" }, "Add Fragment")
+      );
+    });
+
+    await click(page, $root.child(0, "a"));
+
+    t.ok(/#success$/.test(await page.url()));
   });
-
-  await t.click($root.child("a"));
-
-  const uri = await t.eval(() => document.documentURI);
-  await t.expect(uri).match(/#success$/);
 });
 
 test("Booleans", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("div", { "x-a": false, "x-b": true })
-    );
-  });
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("div", { "x-a": false, "x-b": true })
+      );
+    });
 
-  await t.expect($root.child(0).attributes).eql({ "x-b": "" });
+    t.eq(await select(page, $root.child(0).attributes), { "x-b": "" });
+  });
 });
 
 test("Swapping", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("b", {}, "Bold"),
-      bdc.h("i", {}, "Italic")
-    );
-  });
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("b", {}, "Bold"),
+        bdc.h("i", {}, "Italic")
+      );
+    });
 
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("i", {}, "Italic"),
-      bdc.h("b", {}, "Bold")
-    );
-  });
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("i", {}, "Italic"),
+        bdc.h("b", {}, "Bold")
+      );
+    });
 
-  await t.expect($root.childElementCount).eql(2);
-  await t.expect($root.child(0).tagName).eql("i");
-  await t.expect($root.child(0).textContent).eql("Italic");
-  await t.expect($root.child(1).tagName).eql("b");
-  await t.expect($root.child(1).textContent).eql("Bold");
+    t.eq(await select(page, $root.childElementCount), 2);
+    t.eq(await select(page, $root.child(0).tagName), "i");
+    t.eq(await select(page, $root.child(0).textContent), "Italic");
+    t.eq(await select(page, $root.child(1).tagName), "b");
+    t.eq(await select(page, $root.child(1).textContent), "Bold");
+  });
 });
 
 test("Removing attributes", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("div", { "x-a": "original" })
-    );
-  });
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("div", { "x-a": "original" })
+      );
+    });
 
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("div", { "x-b": "new" })
-    );
-  });
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("div", { "x-b": "new" })
+      );
+    });
 
-  await t.expect($root.child(0).attributes).eql({ "x-b": "new" });
+    t.eq(await select(page, $root.child(0).attributes), { "x-b": "new" });
+  });
 });
 
 test("Event handlers", async (t) => {
-  // Set an event handler.
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("button", {
-        onclick: (evt) => {
-          evt.target.setAttribute("x-clicked", "");
-        },
-      })
-    );
+  await withPage(async (page) => {
+    // Set an event handler.
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("button", {
+          onclick: (evt) => {
+            evt.target.setAttribute("x-clicked", "");
+          },
+        })
+      );
+    });
+
+    // Click the button.
+    await click(page, $root.child(0, "button"));
+
+    // Check the value.
+    t.eq(await select(page, $root.child(0).attributes), { "x-clicked": "" });
   });
-
-  // Click the button.
-  await t.click($root.child("button"));
-
-  // Check the value.
-  await t.expect($root.child(0).attributes).eql({ "x-clicked": "" });
 });
 
 test("Removing event handlers", async (t) => {
-  // Set an event handler.
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("button", {
-        onclick: (evt) => {
-          evt.target.setAttribute("x-clicked", "");
-        },
-      })
-    );
+  await withPage(async (page) => {
+    // Set an event handler.
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("button", {
+          onclick: (evt) => {
+            evt.target.setAttribute("x-clicked", "");
+          },
+        })
+      );
+    });
+
+    // Remove the event handler.
+    await page.evaluate(() => {
+      bdc.clobber(document.getElementById("root"), bdc.h("button", {}));
+    });
+
+    // Click the button.
+    await click(page, $root.child(0, "button"));
+
+    // Check that the handler wasn't fired.
+    t.eq(await select(page, $root.child(0).attributes), {});
   });
-
-  // Remove the event handler.
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), bdc.h("button", {}));
-  });
-
-  // Click the button.
-  await t.click($root.child("button"));
-
-  // Check that the handler wasn't fired.
-  await t.expect($root.child(0).attributes).eql({});
 });
 
 test("Replacing event handlers", async (t) => {
-  // Set an event handler.
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("button", {
-        onclick: (evt) => {
-          evt.target.setAttribute("x-old-clicked", "");
-        },
-      })
-    );
+  await withPage(async (page) => {
+    // Set an event handler.
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("button", {
+          onclick: (evt) => {
+            evt.target.setAttribute("x-old-clicked", "");
+          },
+        })
+      );
+    });
+
+    // Remove the event handler.
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("button", {
+          onclick: (evt) => {
+            evt.target.setAttribute("x-new-clicked", "");
+          },
+        })
+      );
+    });
+
+    // Click the button.
+    await click(page, $root.child(0, "button"));
+
+    // Check that the handler wasn't fired.
+    t.eq(await select(page, $root.child(0).attributes), {
+      "x-new-clicked": "",
+    });
   });
-
-  // Remove the event handler.
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("button", {
-        onclick: (evt) => {
-          evt.target.setAttribute("x-new-clicked", "");
-        },
-      })
-    );
-  });
-
-  // Click the button.
-  await t.click($root.child("button"));
-
-  // Check that the handler wasn't fired.
-  await t.expect($root.child(0).attributes).eql({ "x-new-clicked": "" });
 });
 
 test("Restoring event handlers", async (t) => {
-  // Set an event handler.
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("button", {
-        onclick: (evt) => {
-          evt.target.setAttribute("x-clicked", "");
-        },
-      })
-    );
+  await withPage(async (page) => {
+    // Set an event handler.
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("button", {
+          onclick: (evt) => {
+            evt.target.setAttribute("x-clicked", "");
+          },
+        })
+      );
+    });
+
+    // Remove the event handler.
+    await page.evaluate(() => {
+      bdc.clobber(document.getElementById("root"), bdc.h("button", {}));
+    });
+
+    // Reset the event handler.
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("button", {
+          onclick: (evt) => {
+            evt.target.setAttribute("x-clicked", "");
+          },
+        })
+      );
+    });
+
+    // Click the button.
+    await click(page, $root.child(0, "button"));
+
+    // Check that the handler wasn't fired.
+    t.eq(await select(page, $root.child(0).attributes), { "x-clicked": "" });
   });
-
-  // Remove the event handler.
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), bdc.h("button", {}));
-  });
-
-  // Reset the event handler.
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("button", {
-        onclick: (evt) => {
-          evt.target.setAttribute("x-clicked", "");
-        },
-      })
-    );
-  });
-
-  // Click the button.
-  await t.click($root.child("button"));
-
-  // Check that the handler wasn't fired.
-  await t.expect($root.child(0).attributes).eql({ "x-clicked": "" });
 });
 
 test("Re-apply input value preserves cursor", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), bdc.h("input", { value: "" }));
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("input", { value: "" })
+      );
+    });
+
+    await click(page, $root.child(0));
+    await page.keyboard.press("a");
+    await page.keyboard.press("ArrowLeft");
+
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("input", { value: "a" })
+      );
+    });
+
+    await page.keyboard.press("b");
+
+    t.eq(await select(page, $root.child(0).property("value")), "ba");
   });
-
-  await t.click($root.child(0));
-  await t.pressKey("a");
-  await t.pressKey("left");
-
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("input", { value: "a" })
-    );
-  });
-
-  await t.pressKey("b");
-
-  await t.expect($root.child(0).value).eql("ba");
 });
 
 test("No injection on create text node", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("p", {}, "<script>window.alert('w00t')</script>")
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("p", {}, "<script>window.alert('w00t')</script>")
+      );
+    });
+
+    t.eq(await select(page, $root.childElementCount), 1);
+    t.eq(
+      await select(page, $root.child(0).textContent),
+      "<script>window.alert('w00t')</script>"
     );
   });
-
-  await t.expect($root.childElementCount).eql(1);
-  await t
-    .expect($root.child(0).textContent)
-    .eql("<script>window.alert('w00t')</script>");
 });
 
 test("No injection on update text node", async (t) => {
-  await t.eval(() => {
-    bdc.clobber(document.getElementById("root"), bdc.h("p", {}, "harmless"));
-  });
+  await withPage(async (page) => {
+    await page.evaluate(() => {
+      bdc.clobber(document.getElementById("root"), bdc.h("p", {}, "harmless"));
+    });
 
-  await t.eval(() => {
-    bdc.clobber(
-      document.getElementById("root"),
-      bdc.h("p", {}, "<script>window.alert('w00t')</script>")
+    await page.evaluate(() => {
+      bdc.clobber(
+        document.getElementById("root"),
+        bdc.h("p", {}, "<script>window.alert('w00t')</script>")
+      );
+    });
+
+    t.eq(await select(page, $root.childElementCount), 1);
+    t.eq(
+      await select(page, $root.child(0).textContent),
+      "<script>window.alert('w00t')</script>"
     );
   });
-
-  await t.expect($root.childElementCount).eql(1);
-  await t
-    .expect($root.child(0).textContent)
-    .eql("<script>window.alert('w00t')</script>");
 });

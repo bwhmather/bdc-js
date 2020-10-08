@@ -73,18 +73,17 @@ function setAttribute($elem, key, value) {
     // Install and record the new event handler.
     handlers[eventName] = value;
     $elem.addEventListener(eventName, value, false);
-
   } else if (key === "style") {
     // `$elem.style` is a CSS object, but they aren't terribly easy to build.
     // We instead expect the style to be built as a string and clobber cssText.
     $elem.style.cssText = value;
-
   } else if (key in $elem) {
     // Element exposes attribute as a property.  We should be able to set it
     // using an assignment expression.
     if (
       ($elem.localName === "input" || $elem.localName === "textarea") &&
-      key === "value" && $elem.value === "" + value &&
+      key === "value" &&
+      $elem.value === "" + value &&
       $elem === document.activeElement
     ) {
       // Chrome will jump the cursor to an end of `input` box or `textarea` if
@@ -96,14 +95,12 @@ function setAttribute($elem, key, value) {
     } else {
       $elem[key] = value;
     }
-
   } else if (typeof value === "boolean") {
     if (value) {
       $elem.setAttribute(key, "");
     } else {
       $elem.removeAttribute(key);
     }
-
   } else {
     $elem.setAttribute(key, value);
   }
@@ -136,17 +133,14 @@ function removeAttribute($elem, key) {
         EVENT_HANDLER_MAP.delete($elem);
       }
     }
-
   } else if (key === "style") {
     $elem.style.cssText = "";
-
   } else if (
     key in $elem &&
     !($elem.localName === "option" && key === "value") &&
     !($elem.localName === "input" && key === "type")
   ) {
     $elem[key] = null;
-
   } else {
     $elem.removeAttribute(key);
   }
@@ -211,7 +205,7 @@ function updateAttributes($elem, attrs) {
  */
 function updateChildren($elem, children) {
   let $cursor = $elem.firstChild;
-  children.forEach(childNode => {
+  children.forEach((childNode) => {
     $cursor = update(childNode, $elem, $cursor);
   });
 
@@ -256,7 +250,6 @@ function update(node, $parent, $cursor) {
     } else {
       $elem.nodeValue = node;
     }
-
   } else {
     // Find matching element.
     const nodeKey = node.attrs["x-bdc-key"] || null;
@@ -376,6 +369,6 @@ export function clobber($root, ...children) {
     document.activeElement !== $FOCUS_TARGET &&
     typeof $FOCUS_TARGET.focus === "function"
   ) {
-    $FOCUS_TARGET.focus({preventScroll: true});
+    $FOCUS_TARGET.focus({ preventScroll: true });
   }
 }

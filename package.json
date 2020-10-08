@@ -16,13 +16,13 @@
   "types": "dist/types/index.d.ts",
   "dependencies": {},
   "devDependencies": {
+    "prettier": "^2.1.2",
     "rollup": "^2.22.0",
     "rollup-plugin-terser": "^6.1.0",
     "rollup-plugin-typescript2": "^0.27.1",
     "testcafe": "^1.8.8",
     "tslint": "^6.1.2",
-    "typescript": "^3.9.7",
-    "typescript-formatter": "^7.2.2"
+    "typescript": "^3.9.7"
   },
   "scripts": {
     "build": "rollup -c",

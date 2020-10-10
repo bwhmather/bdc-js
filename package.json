@@ -19,9 +19,9 @@
     "faucet": "0.0.1",
     "playwright": "^1.4.2",
     "prettier": "^2.1.2",
-    "rollup": "^2.22.0",
-    "rollup-plugin-terser": "^6.1.0",
-    "rollup-plugin-typescript2": "^0.27.1",
+    "rollup": "^2.29.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.27.3",
     "tslint": "^6.1.2",
     "typescript": "^3.9.7",
     "zora": "^4.0.0"

@@ -25,3 +25,7 @@ jobs:
         on:
           branch: "master"
           tags: true
+
+cache:
+  directories:
+    - "$HOME/.cache/ms-playwright"

@@ -194,6 +194,12 @@ to true.  If `autofocus` is set on an already existing element, it will have no
 effect.  If no new elements are created with `autofocus` set to true, BDC will
 preserve the current focus.
 
+```javascript
+clobber(document.getElementById("form"), [
+    h("label" {for: "input"}, "Text field"),
+    h("input", {id: "input", autofocus: true}),
+]);
+```
 
 ### CSS
 

@@ -25,9 +25,10 @@ It is a bad choice for pages that must repeatedly re-render a large amount of
 dynamic data, and for more complicated applications where you may benefit from
 the larger ecosystem around other libraries.
 
-BDC is currently under active development.  The API is unlikely to change
-significantly before 1.0, but there may still be bugs that need to be ironed
-out.
+BDC is now largely finished.  The API is frozen and all bugs that I am aware of
+have been fixed.  It has seen enough real world use that I am now confident to
+recommend it in the niche it aims to fill.  Expect a steady trickle of
+documentation improvements and occasional bug fixes but no breaking changes.
 
 
 ## Installation

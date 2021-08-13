@@ -77,7 +77,7 @@ what would result from the following HTML:
 </marquee>
 ```
 
-Both `h` and `clobber` can accept child nodes either as variadic arguments or 
+Both `h` and `clobber` can accept child nodes either as variadic arguments or
 as a list.  The following two calls are equivalent:
 
 ```javascript
@@ -221,7 +221,12 @@ will remain stable (see [Keyed Updates](#keyed-updates)).
 It will, however, automatically remove modifications made by other code to the
 nodes that it is responsible for.
 
-Fortunately BDC integrates well with webcomponents.
+To avoid this, you can wrap elements that should not be changed by BDC in a
+[Web Component](https://developer.mozilla.org/en-US/docs/Web/Web_Components).
+BDC can instantiate Webcomponents in exactly the same way as it instantiates
+regular DOM elements, and will not reach into the shadow DOM.
+
+See [examples/popover](./examples/popover) for a simple demonstration.
 
 
 ## Contributing

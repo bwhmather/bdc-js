@@ -14,9 +14,12 @@ Instead it follows the Elm model and requires a complete description of the
 target state to be provided as a static data structure.
 BDC can be used with WebComponents if stateful sub-trees are required.
 
-BDC does not construct a virtual DOM, preferring to diff directly against
-the real thing.
-This results in a smaller, simpler, and probably much slower library.
+BDC does not construct a virtual DOM.  Instead it diffs directly against the
+real thing.  This is what enables BDC to be so small, but comes at the cost of
+making updates relatively slow.  The BDC submission to the
+[JS Framework Benchmark](https://github.com/krausest/js-framework-benchmark)
+competition does extremely well in the startup tests, but is one of the slowest
+for repeated updates.
 
 BDC is a good choice for small projects that are too dynamic to complete easily
 using vanilla javascript, but where a complex build setup and tens of megabytes

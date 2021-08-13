@@ -1,0 +1,80 @@
+<html>
+  <head>
+    <script src="../../dist/bdc.js"></script>
+    <script>
+      class Popover extends HTMLElement {
+        css = `
+        .anchor {
+          position: relative;
+        }
+        .popover {
+          display: block;
+          position: absolute;
+          top: 2px;
+          left: 10px;
+
+          padding: 2px;
+          background: #eee;
+          border: 2px solid black;
+        }
+        `;
+
+        constructor() {
+          super();
+          this.attachShadow({ mode: "open" });
+          this.visible = false;
+          this.render();
+        }
+
+        toggle() {
+          this.visible = !this.visible;
+          this.render();
+        }
+
+        render() {
+          bdc.clobber(
+            this.shadowRoot,
+            bdc.h(
+              "div",
+              bdc.h("style", this.css),
+              bdc.h(
+                "button",
+                {
+                  onclick: (evt) => {
+                    evt.preventDefault();
+                    this.toggle();
+                  },
+                },
+                "Toggle"
+              ),
+              bdc.h(
+                "div",
+                { class: "anchor" },
+                bdc.h(
+                  "div",
+                  {
+                    class: "popover",
+                    style: this.visible ? "" : "display: none",
+                  },
+                  bdc.h("slot")
+                )
+              )
+            )
+          );
+        }
+      }
+      customElements.define("bdc-popover", Popover);
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script>
+      const root = document.getElementById("root");
+      bdc.clobber(
+        root,
+        bdc.h("bdc-popover", bdc.h("bdc-popover", "Lorem Ipsum"))
+      );
+    </script>
+  </body>
+</html>

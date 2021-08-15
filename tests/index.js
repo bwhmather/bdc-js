@@ -41,8 +41,6 @@ function serveFixtures(req, res) {
 }
 
 class ValueSelector {
-  #selectFn;
-
   constructor(selectFn) {
     this.#selectFn = selectFn;
   }
@@ -53,8 +51,6 @@ class ValueSelector {
 }
 
 class ElementSelector {
-  #query;
-
   constructor(query) {
     this.#query = query;
   }

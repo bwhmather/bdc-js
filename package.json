@@ -16,15 +16,13 @@
   "types": "dist/types/index.d.ts",
   "devDependencies": {
     "@playwright/test": "^1.14.0",
-    "faucet": "0.0.1",
     "playwright": "^1.4.2",
     "prettier": "^2.1.2",
     "rollup": "^2.29.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.27.3",
     "tslint": "^6.1.2",
-    "typescript": "^3.9.7",
-    "zora": "^4.0.0"
+    "typescript": "^3.9.7"
   },
   "scripts": {
     "build": "rollup -c",

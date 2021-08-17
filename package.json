@@ -14,8 +14,8 @@
   "module": "dist/bdc.mjs",
   "jsnext:main": "dist/bdc.mjs",
   "types": "dist/types/index.d.ts",
-  "dependencies": {},
   "devDependencies": {
+    "@playwright/test": "^1.14.0",
     "faucet": "0.0.1",
     "playwright": "^1.4.2",
     "prettier": "^2.1.2",

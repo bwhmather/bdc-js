@@ -29,7 +29,7 @@
   "scripts": {
     "build": "rollup -c",
     "pretest": "npm run build",
-    "test": "node tests/index.js | faucet",
+    "test": "playwright test",
     "tslint": "tslint -p tsconfig.json src/*.ts src/*/*.ts",
     "prepack": "npm run build"
   },

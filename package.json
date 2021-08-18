@@ -29,6 +29,8 @@
     "pretest": "npm run build",
     "test": "playwright test",
     "tslint": "tslint -p tsconfig.json src/*.ts src/*/*.ts",
+    "prettier": "prettier --check src tests",
+    "prettier:fix": "prettier --write src tests",
     "prepack": "npm run build"
   },
   "files": [

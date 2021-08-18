@@ -2,21 +2,74 @@ name: Continuous integration workflow
 on: [push]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    name: "test - ${{ matrix.os }} (${{ matrix.browser }})"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [firefox, chromium, webkit]
+        os: [ubuntu-18.04]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-      - run: npm install
-      - run: npm run build
-      - run: npm test
-        env:
-          CI: true
-      - run: npm run tslint
-      - run: npm pack
-      - uses: actions/upload-artifact@v2
+      - uses: actions/setup-node@v2
         with:
-          name: package
-          path: bdc-*.tgz
+          node-version: '14'
+      - name: "Install NPM dependencies"
+        run: npm ci
+        env:
+          DEBUG: pw:install
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - name: "Install browser"
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: "Compile source files"
+        run: npm run build
+      - name: "Run tests"
+        run: npx playwright test --browser ${{ matrix.browser }}
 
+  lint:
+    name: "lint - ${{ matrix.os }}"
+
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: "Install NPM dependencies"
+        run: npm ci
+        env:
+          DEBUG: pw:install
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - name: "Run tslint"
+        run: npm run tslint
+
+  format:
+    name: "format - ${{ matrix.os }}"
+
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: "Install NPM dependencies"
+        run: npm ci
+        env:
+          DEBUG: pw:install
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - name: "Run tslint"
+        run: npm run prettier

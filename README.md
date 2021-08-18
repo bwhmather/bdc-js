@@ -207,11 +207,11 @@ clobber(document.getElementById("form"), [
 
 ### CSS
 
-The `style` attribute is a string, as most users would expect, but is
+The `style` attribute is set as a string, as most users would expect, but is
 implemented as a special case and therefore deserves mention.
 
 While most attributes have fairly straightforward DOM property counterparts,
-`style` us parsed and exposed as a [CSSStyleDeclarationProperty](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration).
+`style` is parsed and exposed as a [CSSStyleDeclarationProperty](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration).
 Rather than expect users to construct on of these for each render, BDC will set
 the existing objects `cssText` property to match what the user passes.
 

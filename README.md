@@ -1,7 +1,7 @@
 Ben's DOM Clobberer
 ===================
 
-[![Build Status](https://travis-ci.org/bwhmather/bdc-js.svg?branch=master)](https://travis-ci.org/bwhmather/bdc-js)
+[![Build Status](https://github.com/bwhmather/bdc-js/actions/workflows/ci.yml/badge.svg)](https://github.com/bwhmather/bdc-js/actions/workflows/ci.yml)
 
 Ben's DOM Clobberer (BDC) is a tiny javascript library for updating the html DOM
 to match a javascript description.

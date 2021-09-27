@@ -158,11 +158,13 @@ function removeAttribute($elem, key) {
  */
 function listAttributes($elem) {
   const attrs = [];
-  // tslint:disable-next-line
-  for (let i = 0; i < $elem.attributes.length; i++) {
-    attrs.push($elem.attributes[i].name);
+  for (const attr of $elem.attributes) {
+    attrs.push(attr.name);
   }
 
+  // TSLint will complain that we are not doing a `hasOwnProperty` check.  This
+  // is fine because we control the objects inserted `EVENT_HANDLER_MAP` and
+  // can be sure that there isn't anything in the prototype
   // tslint:disable-next-line
   for (const eventName in EVENT_HANDLER_MAP.get($elem)) {
     attrs.push("on" + eventName);

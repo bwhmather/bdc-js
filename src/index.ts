@@ -37,18 +37,13 @@ const EVENT_HANDLER_MAP = new WeakMap();
 let $FOCUS_TARGET = null;
 
 /**
- * Sets an attribute or event handler on an HTML element to the requested
- * value.
- *
- * The behaviour is quite attribute specific, but is intended to allow node
- * descriptions to more closely resemble HTML-as-text instead of HTML as DOM.
- * Calling `$elem.getAttribute(key)` will often return a deserialized
- * equivalent of value or, as in the case of event handlers, nothing at all.
+ * Sets the named property, attribute or event handler on an HTML element to
+ * the requested value.
  *
  * @param $elem
  *   The HTML element to set the attribute on.
  * @param key
- *   The name of the attribute or event handler to set.
+ *   The name of the property, attribute or event handler to set.
  * @param value
  *   A description of the value to set.
  */
@@ -74,12 +69,20 @@ function setAttribute($elem, key, value) {
     handlers[eventName] = value;
     $elem.addEventListener(eventName, value, false);
   } else if (key === "style") {
-    // `$elem.style` is a CSS object, but they aren't terribly easy to build.
-    // We instead expect the style to be built as a string and clobber cssText.
+    // `$elem.style` is a CSS object, but CSS objects aren't terribly easy for
+    // users to construct.  We have this special case so that they can pass in
+    // a string instead.
     $elem.style.cssText = value;
   } else if (key in $elem) {
-    // Element exposes attribute as a property.  We should be able to set it
-    // using an assignment expression.
+    // Element exposes attribute as a property.
+    // We always want new values set by BDC to take priority over old values
+    // set by the user.  Most properties and attributes are synchronised, but
+    // there are exceptions.  If, as is the case with `value`, it is possible
+    // for a property to be changed by user interaction then the DOM will only
+    // synchronise from the attribute to the property and will stop
+    // synchronising if the property is overridden.  As a consequence, if the
+    // attribute is also exposed as a property then we prefer to set the
+    // property instead  of the attribute.
     if (
       ($elem.localName === "input" || $elem.localName === "textarea") &&
       key === "value" &&
@@ -233,7 +236,7 @@ function updateChildren($elem, children) {
  * @param $parent
  *   The HTML element that the updated element should be a child of.  This is a
  *   required argument.
- * @param $elem
+ * @param $cursor
  *   The element currently sitting at the location that should be updated to
  *   match the node description.  If `null`, it is assumed that the node
  *   describes a new child that should be appended to the current list.  If the
@@ -241,7 +244,8 @@ function updateChildren($elem, children) {
  *   rather than updated.
  *
  * @returns
- *   An updated cursor.
+ *   An updated cursor.  This will be the next child of the parent after the
+ *   element that was updated.
  */
 function update(node, $parent, $cursor) {
   let $elem = $cursor;
@@ -254,6 +258,10 @@ function update(node, $parent, $cursor) {
     }
   } else {
     // Find matching element.
+    // As part of `updateChildren`, this search is worst case O(n * m) in the
+    // number of nodes and elements.  Typical case is that the order of the
+    // two lists matches and you just get a single linear traversal of each of
+    // them.
     const nodeKey = node.attrs["x-bdc-key"] || null;
 
     while ($elem) {

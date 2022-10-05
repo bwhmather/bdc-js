@@ -15,8 +15,8 @@
   "jsnext:main": "dist/bdc.mjs",
   "types": "dist/types/index.d.ts",
   "devDependencies": {
-    "@playwright/test": "^1.14.0",
-    "playwright": "^1.4.2",
+    "@playwright/test": "^1.26.1",
+    "playwright": "^1.26.1",
     "prettier": "^2.1.2",
     "rollup": "^2.29.0",
     "rollup-plugin-terser": "^7.0.2",

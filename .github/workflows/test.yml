@@ -1,17 +1,16 @@
-name: Testing workflow
+name: Test
 on: [push]
 
 jobs:
   test:
-    name: "test - ${{ matrix.os }} (${{ matrix.browser }})"
+    name: "Test (${{ matrix.browser }})"
 
     strategy:
       fail-fast: false
       matrix:
         browser: [firefox, chromium, webkit]
-        os: [ubuntu-22.04]
 
-    runs-on: ${{ matrix.os }}
+    runs-on: "ubuntu-22.04"
 
     steps:
       - uses: actions/checkout@v3
@@ -31,13 +30,9 @@ jobs:
         run: npx playwright test --browser ${{ matrix.browser }}
 
   lint:
-    name: "lint - ${{ matrix.os }}"
+    name: "Lint"
 
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: "ubuntu-22.04"
 
     steps:
       - uses: actions/checkout@v3
@@ -53,13 +48,9 @@ jobs:
         run: npm run tslint
 
   format:
-    name: "format - ${{ matrix.os }}"
+    name: "Format"
 
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: "ubuntu-22.04"
 
     steps:
       - uses: actions/checkout@v3

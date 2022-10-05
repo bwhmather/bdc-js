@@ -1,4 +1,4 @@
-import typescript from 'rollup-plugin-typescript2';
+import typescript from '@rollup/plugin-typescript';
 import { terser } from 'rollup-plugin-terser';
 
 
@@ -7,13 +7,9 @@ export default [
     input: 'src/index.ts',
     plugins: [
       typescript({
-        abortOnError: false,
-        useTsconfigDeclarationDir: true,
-        tsconfigOverride: {
-          compilerOptions: {
-            declaration: true,
-            declarationDir: "dist/types",
-          },
+        compilerOptions: {
+          declaration: true,
+          declarationDir: "dist",
         },
       }),
     ],
@@ -27,9 +23,7 @@ export default [
   {
     input: 'src/index.ts',
     plugins: [
-      typescript({
-        abortOnError: false,
-      }),
+      typescript(),
     ],
     output: {
       format: 'cjs',
@@ -41,14 +35,13 @@ export default [
   {
     input: 'src/index.ts',
     plugins: [
-      typescript({
-        abortOnError: false,
-      }),
+      typescript(),
     ],
     output: {
       format: 'iife',
       name: 'bdc',
       file: 'dist/bdc.js',
+      esModule: false,
       sourcemap: true,
       sourcemapFile: 'dist/bdc.js.map',
     }
@@ -56,15 +49,14 @@ export default [
   {
     input: 'src/index.ts',
     plugins: [
-      typescript({
-        abortOnError: false,
-      }),
+      typescript(),
       terser(),
     ],
     output: {
       format: 'iife',
       name: 'bdc',
       file: 'dist/bdc.min.js',
+      esModule: false,
       sourcemap: true,
       sourcemapFile: 'dist/bdc.min.js.map'
     }

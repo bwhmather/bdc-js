@@ -61,7 +61,7 @@ function setAttribute($elem, key, value) {
     const handlers = EVENT_HANDLER_MAP.get($elem);
 
     // Check for and, if necessary, remove any old event handlers.
-    if (handlers.hasOwnProperty(eventName)) {
+    if (Object.prototype.hasOwnProperty.call(handlers, eventName)) {
       $elem.removeEventListener(eventName, handlers[eventName], false);
     }
 
@@ -165,10 +165,9 @@ function listAttributes($elem) {
     attrs.push(attr.name);
   }
 
-  // TSLint will complain that we are not doing a `hasOwnProperty` check.  This
-  // is fine because we control the objects inserted `EVENT_HANDLER_MAP` and
-  // can be sure that there isn't anything in the prototype
-  // tslint:disable-next-line
+  // TSLint used to complain that we are not doing a `hasOwnProperty` check.
+  // This is fine because we control the objects in `EVENT_HANDLER_MAP` and can
+  // be sure that there isn't anything in the prototype.
   for (const eventName in EVENT_HANDLER_MAP.get($elem)) {
     attrs.push("on" + eventName);
   }
@@ -188,15 +187,13 @@ function listAttributes($elem) {
  */
 function updateAttributes($elem, attrs) {
   for (const attr of listAttributes($elem)) {
-    if (!attrs.hasOwnProperty(attr)) {
+    if (!Object.prototype.hasOwnProperty.call(attrs, attr)) {
       removeAttribute($elem, attr);
     }
   }
 
-  for (const attr in attrs) {
-    if (attrs.hasOwnProperty(attr)) {
-      setAttribute($elem, attr, attrs[attr]);
-    }
+  for (const attr of Object.keys(attrs)) {
+    setAttribute($elem, attr, attrs[attr]);
   }
 }
 

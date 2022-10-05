@@ -44,8 +44,8 @@ jobs:
         env:
           DEBUG: pw:install
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-      - name: "Run tslint"
-        run: npm run tslint
+      - name: "Run eslint"
+        run: npm run eslint
 
   format:
     name: "Format"

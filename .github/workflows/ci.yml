@@ -71,5 +71,5 @@ jobs:
         env:
           DEBUG: pw:install
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-      - name: "Run tslint"
+      - name: "Run prettier"
         run: npm run prettier

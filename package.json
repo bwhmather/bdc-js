@@ -44,6 +44,6 @@
     "dist/bdc.mjs.map",
     "dist/bdc.umd.js",
     "dist/bdc.umd.js.map",
-    "dist/types/*.d.ts"
+    "dist/index.d.ts"
   ]
 }

@@ -243,3 +243,15 @@ Bug reports and pull requests welcomed enthusiastically.
 BDC is made available under the terms of the MIT license.  See `LICENSE` for
 details.
 
+
+## Changelog
+
+### 1.0.1
+
+Minor maintenance release, mostly to make sure that releasing still works.
+
+  - Adds new `popover` example and documentation about use with Web Components.
+  - Fixes hasOwnProperty misuse that might, hypothetically, have resulted in odd things happening if a class instance was passed as an attribute object.
+  - Bumps all dev dependencies.
+  - Switches from travis build to github actions for CI.
+

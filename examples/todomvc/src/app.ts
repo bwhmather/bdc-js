@@ -5,16 +5,16 @@ const ESC_KEY = 27;
 
 let newTodo = "";
 
-let nextItemId: number = 1;
+let nextItemId = 1;
 
-let showCompleted: boolean = true;
-let showActive: boolean = true;
+let showCompleted = true;
+let showActive = true;
 
 class TodoItem {
-  id: number = nextItemId++;
-  completed: boolean = false;
-  editing: boolean = false;
-  title: string = "";
+  id = nextItemId++;
+  completed = false;
+  editing = false;
+  title = "";
 }
 
 const items: TodoItem[] = [];
@@ -123,8 +123,8 @@ function handleHeaderKeyDown(evt: KeyboardEvent) {
   }
 }
 
-function handleHeaderInput(evt: any) {
-  newTodo = evt.target.value;
+function handleHeaderInput(evt: InputEvent) {
+  newTodo = (evt.target! as HTMLInputElement).value;
 
   redraw();
 }
@@ -152,7 +152,7 @@ function handleItemDoubleClick(id: number, evt: MouseEvent) {
 
 function handleItemKeyDown(id: number, evt: KeyboardEvent) {
   if (evt.keyCode === ENTER_KEY) {
-    let title = (evt.target! as HTMLInputElement).value.trim();
+    const title = (evt.target! as HTMLInputElement).value.trim();
     if (!title) {
       removeItem(id);
     } else {
@@ -174,7 +174,7 @@ function handleItemKeyDown(id: number, evt: KeyboardEvent) {
 }
 
 function handleItemBlur(id: number, evt: Event) {
-  let title = (evt.target! as HTMLInputElement).value.trim();
+  const title = (evt.target! as HTMLInputElement).value.trim();
   if (!title) {
     removeItem(id);
   } else {
@@ -187,7 +187,7 @@ function handleItemBlur(id: number, evt: Event) {
 }
 
 function handleItemStateToggled(id: number, evt: InputEvent) {
-  let checked = (evt.target! as HTMLInputElement).checked;
+  const checked = (evt.target! as HTMLInputElement).checked;
   if (checked) {
     completeItem(id);
   } else {

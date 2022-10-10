@@ -110,16 +110,16 @@ function clearCompleted() {
 
 function handleHeaderKeyDown(evt: KeyboardEvent) {
   switch (evt.keyCode) {
-  case ENTER_KEY:
-    if (!newTodo.trim()) {
-      break;
-    }
-    addItem(newTodo.trim());
-    newTodo = "";
+    case ENTER_KEY:
+      if (!newTodo.trim()) {
+        break;
+      }
+      addItem(newTodo.trim());
+      newTodo = "";
 
-    evt.preventDefault();
-    redraw();
-    break;
+      evt.preventDefault();
+      redraw();
+      break;
   }
 }
 
@@ -130,7 +130,7 @@ function handleHeaderInput(evt: InputEvent) {
 }
 
 function renderHeader() {
-  return h("header", {class: "header"}, [
+  return h("header", { class: "header" }, [
     h("h1", "todos"),
     h("input", {
       class: "new-todo",
@@ -217,16 +217,21 @@ function renderItem(item: TodoItem): Node {
 
   let inner;
   if (!item.editing) {
-    inner = h("div", {class: "view"}, [
+    inner = h("div", { class: "view" }, [
       h("input", {
-        class: "toggle", type: "checkbox",
+        class: "toggle",
+        type: "checkbox",
         onchange: (evt: InputEvent) => handleItemStateToggled(id, evt),
         checked: item.completed,
       }),
-      h("label", {
-        ondblclick: (evt: MouseEvent) => handleItemDoubleClick(id, evt)
-      }, item.title),
-      h("button", {class: "destroy"}),
+      h(
+        "label",
+        {
+          ondblclick: (evt: MouseEvent) => handleItemDoubleClick(id, evt),
+        },
+        item.title
+      ),
+      h("button", { class: "destroy" }),
     ]);
   } else {
     inner = h("input", {
@@ -237,7 +242,7 @@ function renderItem(item: TodoItem): Node {
       autofocus: true,
     });
   }
-  return h("li", {class: classes.join(" ")}, inner);
+  return h("li", { class: classes.join(" ") }, inner);
 }
 
 function handleToggleAllChanged(evt: InputEvent) {
@@ -251,7 +256,7 @@ function handleToggleAllChanged(evt: InputEvent) {
 }
 
 function renderMain(): Node {
-  return h("section", {class: "main"}, [
+  return h("section", { class: "main" }, [
     h("input", {
       class: "toggle-all",
       id: "toggle-all",
@@ -259,10 +264,14 @@ function renderMain(): Node {
       checked: completed && !remaining,
       onchange: handleToggleAllChanged,
     }),
-    h("label", {for: "toggle-all"}, "Mark all as complete"),
-    h("ul", {class: "todo-list"}, visibleItems.map((item) => {
-      return renderItem(item);
-    }))
+    h("label", { for: "toggle-all" }, "Mark all as complete"),
+    h(
+      "ul",
+      { class: "todo-list" },
+      visibleItems.map((item) => {
+        return renderItem(item);
+      })
+    ),
   ]);
 }
 
@@ -272,42 +281,69 @@ function renderFooter(): Node {
   }
   const contents = [];
 
-  contents.push(h("span", {class: "todo-count"}, [
-    h("strong", "" + remaining),
-    remaining === 1 ? " item left" : " items left",
-  ]));
+  contents.push(
+    h("span", { class: "todo-count" }, [
+      h("strong", "" + remaining),
+      remaining === 1 ? " item left" : " items left",
+    ])
+  );
 
-  contents.push(h("ul", {class: "filters"}, [
-    h("li", h("a", {
-      href: "#/",
-      class: showCompleted && showActive ? "selected" : "",
-    }, "All")),
-    h("li", h("a", {
-      href: "#/active",
-      class: !showCompleted && showActive ? "selected" : "",
-    }, "Active")),
-    h("li", h("a", {
-      href: "#/completed",
-      class: showCompleted && !showActive ? "selected" : "",
-    }, "Completed")),
-  ]));
+  contents.push(
+    h("ul", { class: "filters" }, [
+      h(
+        "li",
+        h(
+          "a",
+          {
+            href: "#/",
+            class: showCompleted && showActive ? "selected" : "",
+          },
+          "All"
+        )
+      ),
+      h(
+        "li",
+        h(
+          "a",
+          {
+            href: "#/active",
+            class: !showCompleted && showActive ? "selected" : "",
+          },
+          "Active"
+        )
+      ),
+      h(
+        "li",
+        h(
+          "a",
+          {
+            href: "#/completed",
+            class: showCompleted && !showActive ? "selected" : "",
+          },
+          "Completed"
+        )
+      ),
+    ])
+  );
 
   if (completed) {
-    contents.push(h("button", {
-        class: "clear-completed",
-        onclick: handleClearCompletedClicked,
-    }, "Clear completed"));
+    contents.push(
+      h(
+        "button",
+        {
+          class: "clear-completed",
+          onclick: handleClearCompletedClicked,
+        },
+        "Clear completed"
+      )
+    );
   }
 
-  return h("footer", {class: "footer"}, contents);
+  return h("footer", { class: "footer" }, contents);
 }
 
 function render(): Node[] {
-  return [
-    renderHeader(),
-    renderMain(),
-    renderFooter(),
-  ];
+  return [renderHeader(), renderMain(), renderFooter()];
 }
 
 let $root: HTMLElement;
@@ -325,24 +361,24 @@ function redraw() {
 
 function handleHashChanged() {
   switch (location.hash) {
-  default:
-    history.replaceState(null, 'All', '#/');
-    return;
+    default:
+      history.replaceState(null, "All", "#/");
+      return;
 
-  case '#/':
-    showCompleted = true;
-    showActive = true;
-    break;
+    case "#/":
+      showCompleted = true;
+      showActive = true;
+      break;
 
-  case '#/active':
-    showCompleted = false;
-    showActive = true;
-    break;
+    case "#/active":
+      showCompleted = false;
+      showActive = true;
+      break;
 
-  case '#/completed':
-    showCompleted = true;
-    showActive = false;
-    break;
+    case "#/completed":
+      showCompleted = true;
+      showActive = false;
+      break;
   }
 
   reindex();

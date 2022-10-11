@@ -327,10 +327,10 @@ export class H {
  *   this node.  Can be provided either as variadic arguments, or as a single
  *   array.
  */
-export function h(type: string, children: Node[]): Node;
-export function h(type: string, ...children: Node[]): Node;
-export function h(type: string, attrs: object, children: Node[]): Node;
-export function h(type: string, attrs: object, ...children: Node[]): Node;
+export function h(type: string, children: Node[]): H;
+export function h(type: string, ...children: Node[]): H;
+export function h(type: string, attrs: object, children: Node[]): H;
+export function h(type: string, attrs: object, ...children: Node[]): H;
 export function h(type, ...children) {
   let attrs = {};
   if (

@@ -255,3 +255,7 @@ Minor maintenance release, mostly to make sure that releasing still works.
   - Bumps all dev dependencies.
   - Switches from travis build to github actions for CI.
 
+### 1.1.0
+
+  - Introduces minor, forwards incompatible fixes to type annotations.  In particular, allows `clobber` to be called on `DocumentFragment`s including `ShadowRoot` and tightens the return type of `h`.
+  - Slightly reduces bundle size by tweaking rollup configuration.

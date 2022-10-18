@@ -45,9 +45,10 @@ export default [
             ecma: 2016,
             compress: {
               ecma: 2016,
-              unsafe_arrows: true,
-              passes: 2,
               unsafe: true,
+              unsafe_arrows: true,
+              unsafe_proto: true,
+              passes: 2,
             },
           }),
         ],

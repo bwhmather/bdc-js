@@ -361,10 +361,16 @@ export function h(type, ...children) {
  *   An arbitrary number of node objects or strings describing the desired
  *   state of the children of this element.
  */
-export function clobber($root: HTMLElement, children: Node[]): void;
-export function clobber($root: HTMLElement, ...children: Node[]): void;
+export function clobber(
+  $root: HTMLElement | DocumentFragment,
+  children: Node[]
+): void;
+export function clobber(
+  $root: HTMLElement | DocumentFragment,
+  ...children: Node[]
+): void;
 export function clobber($root, ...children) {
-  $FOCUS_TARGET = document.activeElement as HTMLElement;
+  $FOCUS_TARGET = document.activeElement as Element;
 
   if (children.length === 1 && Array.isArray(children[0])) {
     children = children[0];
